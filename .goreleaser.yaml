@@ -1,0 +1,10 @@
+project_name: "helix.go"
+
+release:
+  name_template: "v{{ .Version }}"
+
+builds:
+  - skip: true
+
+changelog:
+  skip: true

@@ -1,0 +1,28 @@
+name: Feature request
+description: |
+  You wish to suggest an improvement or a new feature for helix.go.
+
+body:
+  - type: dropdown
+    attributes:
+      label: What integrations would be impacted by this request?
+      description: Select none if this applies to the core or the entire ecosystem.
+      multiple: true
+      options:
+        - clickhouse
+        - nats
+        - postgres
+        - rest
+        - vault
+  - type: textarea
+    attributes:
+      label: Current experience
+      value: Please write a clear and concise description of what is the current experience.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected experience
+      value: Please describe the new feature or experience you are expecting.
+    validations:
+      required: true

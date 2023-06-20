@@ -1,0 +1,23 @@
+titleAndCommits: true
+allowMergeCommits: true
+allowRevertCommits: true
+
+types:
+  - "docs"
+  - "feat"
+  - "fix"
+  - "refactor"
+  - "revert"
+  - "version"
+
+scopes:
+  - "clickhouse"
+  - "event"
+  - "errorstack"
+  - "logger"
+  - "nats"
+  - "postgres"
+  - "rest"
+  - "service"
+  - "tracer"
+  - "vault"
