@@ -21,7 +21,6 @@ fit this ecosystem:
 
   - The Segment's Context described at:
     https://segment.com/docs/connections/spec/common/#context
-
   - The Elastic Common Schema described at:
     https://www.elastic.co/guide/en/ecs/current/ecs-field-reference.html
 */

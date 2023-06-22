@@ -68,7 +68,7 @@ Example:
 	  UserID: "user_2N6YZQLcYy2SPtmHiII69yHp0WE,
 	  Params: url.Values{
 	    "filters": []string{"a", "b", "c"},
-		},
+	  },
 	  Subscription: Subscription{
 	    ID:         "sub_2N6YZQXgQAv87zMmvlHxePCSsRs",
 	    CustomerID: "cus_2N6YZMi3sBDPQBZrZJoYBwhNQNv",
