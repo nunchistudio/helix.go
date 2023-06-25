@@ -3,8 +3,8 @@ module go.nunchi.studio/helix/integration/postgres
 go 1.20
 
 require (
-	github.com/jackc/pgx/v5 v5.3.1
-	github.com/stretchr/testify v1.8.3
+	github.com/jackc/pgx/v5 v5.4.1
+	github.com/stretchr/testify v1.8.4
 	go.nunchi.studio/helix v0.11.0
 )
 
@@ -30,8 +30,8 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
-	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/genproto v0.0.0-20230322174352-cde4c949918d // indirect
