@@ -1,4 +1,4 @@
-package log
+package logger
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 )
 
 /*
-fromContextToZapFields tries to extract a trace from the context to add "trace_id"
+FromContextToZapFields tries to extract a trace from the context to add "trace_id"
 and "span_id" fields to the log.
 */
-func fromContextToZapFields(ctx context.Context) []zapcore.Field {
+func FromContextToZapFields(ctx context.Context) []zapcore.Field {
 	var fields []zapcore.Field
 
 	link := trace.LinkFromContext(ctx)
