@@ -8,14 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"go.nunchi.studio/helix/internal/contextkey"
+
 	"go.opentelemetry.io/otel/baggage"
 )
-
-/*
-eventKeyIdentifier is the key identifier to get/set an Event when interacting
-with a Go context.
-*/
-type eventKeyIdentifier struct{}
 
 /*
 EventFromContext returns the Event found in the context passed, if any. If no
@@ -25,7 +21,7 @@ the context. Returns true if an Event has been found, false otherwise.
 func EventFromContext(ctx context.Context) (Event, bool) {
 	var e Event
 
-	e, ok := ctx.Value(eventKeyIdentifier{}).(Event)
+	e, ok := ctx.Value(contextkey.Event).(Event)
 	if !ok {
 		return eventFromBaggage(baggage.FromContext(ctx))
 	}
@@ -38,7 +34,7 @@ ContextWithEvent returns a copy of the context passed with the Event associated
 to it.
 */
 func ContextWithEvent(ctx context.Context, e Event) context.Context {
-	return context.WithValue(ctx, eventKeyIdentifier{}, e)
+	return context.WithValue(ctx, contextkey.Event, e)
 }
 
 /*

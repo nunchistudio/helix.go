@@ -5,6 +5,8 @@ import (
 	"net/url"
 	"testing"
 
+	"go.nunchi.studio/helix/internal/contextkey"
+
 	"github.com/stretchr/testify/assert"
 	"go.opentelemetry.io/otel/baggage"
 )
@@ -17,17 +19,17 @@ func TestEventFromContext(t *testing.T) {
 		success  bool
 	}{
 		{
-			ctx:      context.WithValue(context.Background(), eventKeyIdentifier{}, "not an Event"),
+			ctx:      context.WithValue(context.Background(), contextkey.Event, "not an Event"),
 			expected: Event{},
 			success:  false,
 		},
 		{
-			ctx:      context.WithValue(context.Background(), eventKeyIdentifier{}, Event{}),
+			ctx:      context.WithValue(context.Background(), contextkey.Event, Event{}),
 			expected: Event{},
 			success:  true,
 		},
 		{
-			ctx: context.WithValue(context.Background(), eventKeyIdentifier{}, Event{
+			ctx: context.WithValue(context.Background(), contextkey.Event, Event{
 				Name: "testing",
 			}),
 			expected: Event{
@@ -85,7 +87,7 @@ func TestContextWithEvent(t *testing.T) {
 			input: Event{
 				Name: "testing",
 			},
-			expected: context.WithValue(context.Background(), eventKeyIdentifier{}, Event{
+			expected: context.WithValue(context.Background(), contextkey.Event, Event{
 				Name: "testing",
 			}),
 			success: true,
