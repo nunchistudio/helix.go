@@ -22,7 +22,7 @@ not ended.
 func Start(ctx context.Context, kind SpanKind, name string) (context.Context, *Span) {
 
 	// Create a new Baggage populated with members retrieved from the context.
-	b, err := baggage.New(fromContextToBaggageMembers(ctx)...)
+	b, err := baggage.New(tracer.FromContextToBaggageMembers(ctx)...)
 	if err != nil {
 		return ctx, nil
 	}
@@ -32,7 +32,7 @@ func Start(ctx context.Context, kind SpanKind, name string) (context.Context, *S
 
 	// Populate the Span attributes retrieved from the context.
 	ctx, span := tracer.Tracer().Start(ctx, name, trace.WithSpanKind(trace.SpanKind(kind)))
-	for _, attr := range fromContextToSpanAttributes(ctx) {
+	for _, attr := range tracer.FromContextToSpanAttributes(ctx) {
 		span.SetAttributes(attr)
 	}
 

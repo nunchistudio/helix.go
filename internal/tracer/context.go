@@ -1,4 +1,4 @@
-package trace
+package tracer
 
 import (
 	"context"
@@ -10,10 +10,10 @@ import (
 )
 
 /*
-fromContextToBaggageMembers tries to extract an event from the context to add
+FromContextToBaggageMembers tries to extract an event from the context to add
 each field as a baggage member to the trace.
 */
-func fromContextToBaggageMembers(ctx context.Context) []baggage.Member {
+func FromContextToBaggageMembers(ctx context.Context) []baggage.Member {
 	var members []baggage.Member
 
 	// Try to extract the event from the context.
@@ -36,10 +36,10 @@ func fromContextToBaggageMembers(ctx context.Context) []baggage.Member {
 }
 
 /*
-fromContextToSpanAttributes tries to extract an event from the context to add
+FromContextToSpanAttributes tries to extract an event from the context to add
 each field as an attribute to the current span.
 */
-func fromContextToSpanAttributes(ctx context.Context) []attribute.KeyValue {
+func FromContextToSpanAttributes(ctx context.Context) []attribute.KeyValue {
 	var attributes []attribute.KeyValue
 
 	// Try to extract the event from the context.
