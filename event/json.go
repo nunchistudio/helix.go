@@ -24,10 +24,10 @@ Example:
 const Key string = "event"
 
 /*
-FromJSON returns the Event found at the "event" key in the JSON-encoded data
+EventFromJSON returns the Event found at the "event" key in the JSON-encoded data
 passed, if any. Returns true if an Event has been found, false otherwise.
 */
-func FromJSON(input json.RawMessage) (Event, bool) {
+func EventFromJSON(input json.RawMessage) (Event, bool) {
 	var e Event
 	var mapped map[string]any
 	err := json.Unmarshal(input, &mapped)

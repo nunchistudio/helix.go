@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFromJSON(t *testing.T) {
+func TestEventFromJSON(t *testing.T) {
 	testcases := []struct {
 		input    json.RawMessage
 		expected Event
@@ -51,7 +51,7 @@ func TestFromJSON(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		actual, ok := FromJSON(tc.input)
+		actual, ok := EventFromJSON(tc.input)
 
 		assert.Equal(t, tc.expected, actual)
 		assert.Equal(t, tc.success, ok)
