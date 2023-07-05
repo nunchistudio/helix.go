@@ -14,6 +14,7 @@ func setDefaultAttributes(span *trace.Span, cfg *Config) {
 	if cfg != nil {
 		span.SetStringAttribute(fmt.Sprintf("%s.server.address", identifier), cfg.Address)
 		span.SetStringAttribute(fmt.Sprintf("%s.agent.address", identifier), cfg.AgentAddress)
+		span.SetStringAttribute(fmt.Sprintf("%s.namespace", identifier), cfg.Namespace)
 	}
 }
 

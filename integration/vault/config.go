@@ -52,6 +52,10 @@ func (cfg *Config) sanitize() error {
 		cfg.Address = "http://127.0.0.1:8200"
 	}
 
+	if cfg.Namespace == "" && os.Getenv("VAULT_NAMESPACE") != "" {
+		cfg.Namespace = os.Getenv("VAULT_NAMESPACE")
+	}
+
 	if cfg.Token == "" && os.Getenv("VAULT_TOKEN") == "" {
 		stack.WithValidations(errorstack.Validation{
 			Message: "Token must be set and not be empty",
