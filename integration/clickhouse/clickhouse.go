@@ -98,7 +98,7 @@ Query executes a query returning multiple rows.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) Query(ctx context.Context, query string, args ...any) (driver.Rows, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRows", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRows", humanized))
 	defer span.End()
 
 	var err error
@@ -121,7 +121,7 @@ QueryRow executes a query returning a single row.
 It automatically handles tracing.
 */
 func (conn *connection) QueryRow(ctx context.Context, query string, args ...any) driver.Row {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRow", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRow", humanized))
 	defer span.End()
 
 	row := conn.client.QueryRow(ctx, query, args...)
@@ -154,7 +154,7 @@ Exec executes a query and does not expect any rows to be returned.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) Exec(ctx context.Context, query string, args ...any) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Exec", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Exec", humanized))
 	defer span.End()
 
 	var err error
@@ -177,7 +177,7 @@ AsyncInsert asynchronously inserts a query.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) AsyncInsert(ctx context.Context, query string, wait bool) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AsyncInsert", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AsyncInsert", humanized))
 	defer span.End()
 
 	var err error

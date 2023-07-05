@@ -110,7 +110,7 @@ begin command: there is no auto-rollback on context cancellation.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) BeginTx(ctx context.Context, opts pgx.TxOptions) (Tx, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Transaction / Begin", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Transaction / Begin", humanized))
 	defer span.End()
 
 	var err error
@@ -139,7 +139,7 @@ $1, $2, etc.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) Exec(ctx context.Context, query string, args ...any) (pgconn.CommandTag, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Exec", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Exec", humanized))
 	defer span.End()
 
 	var err error
@@ -168,7 +168,7 @@ without concern for if the statement has already been prepared.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) Prepare(ctx context.Context, id string, query string) (*pgconn.StatementDescription, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Prepare", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Prepare", humanized))
 	defer span.End()
 
 	var err error
@@ -210,7 +210,7 @@ QueryRewriter that implements named arguments.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) Query(ctx context.Context, query string, args ...any) (pgx.Rows, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRows", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRows", humanized))
 	defer span.End()
 
 	var err error
@@ -235,7 +235,7 @@ pgx.ErrNoRows if no rows are returned.
 It automatically handles tracing.
 */
 func (conn *connection) QueryRow(ctx context.Context, query string, args ...any) pgx.Row {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRow", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRow", humanized))
 	defer span.End()
 
 	row := conn.client.QueryRow(ctx, query, args...)
@@ -253,7 +253,7 @@ The returned BatchResults must be closed before the connection is used again.
 It automatically handles tracing.
 */
 func (conn *connection) SendBatch(ctx context.Context, batch *pgx.Batch) pgx.BatchResults {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRow", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: QueryRow", humanized))
 	defer span.End()
 
 	br := conn.client.SendBatch(ctx, batch)
@@ -269,7 +269,7 @@ WaitForNotification waits for a PostgreSQL notification.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) WaitForNotification(ctx context.Context) (*pgconn.Notification, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: WaitForNotification", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: WaitForNotification", humanized))
 	defer span.End()
 
 	var err error

@@ -89,7 +89,7 @@ func (conn *connection) Publish(ctx context.Context, msg *nats.Msg, opts ...nats
 		}
 	}()
 
-	ack, err := conn.jetstream.PublishMsg(msg, opts...)
+	ack, err := conn.jetstream.PublishMsg(msg, append(opts, nats.Context(ctx))...)
 	setMsgAttributes(span, msg)
 
 	return ack, err
@@ -117,7 +117,7 @@ func (conn *connection) PublishAsync(ctx context.Context, msg *nats.Msg, opts ..
 		}
 	}()
 
-	ackf, err := conn.jetstream.PublishMsgAsync(msg, opts...)
+	ackf, err := conn.jetstream.PublishMsgAsync(msg, append(opts, nats.Context(ctx))...)
 	setMsgAttributes(span, msg)
 
 	return ackf, err
@@ -162,7 +162,7 @@ func (conn *connection) Subscribe(ctx context.Context, subject string, cb MsgHan
 		cb(ctx, msg)
 	}
 
-	return conn.jetstream.Subscribe(subject, wrapped, opts...)
+	return conn.jetstream.Subscribe(subject, wrapped, append(opts, nats.Context(ctx))...)
 }
 
 /*
@@ -170,21 +170,21 @@ SubscribeSync creates a nats.Subscription that can be used to process messages
 synchronously.
 */
 func (conn *connection) SubscribeSync(ctx context.Context, subject string, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return conn.jetstream.SubscribeSync(subject, opts...)
+	return conn.jetstream.SubscribeSync(subject, append(opts, nats.Context(ctx))...)
 }
 
 /*
 ChanSubscribe creates channel based nats.Subscription.
 */
 func (conn *connection) ChanSubscribe(ctx context.Context, subject string, ch chan *nats.Msg, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return conn.jetstream.ChanSubscribe(subject, ch, opts...)
+	return conn.jetstream.ChanSubscribe(subject, ch, append(opts, nats.Context(ctx))...)
 }
 
 /*
 ChanQueueSubscribe creates channel based nats.Subscription with a queue group.
 */
 func (conn *connection) ChanQueueSubscribe(ctx context.Context, subject string, queue string, ch chan *nats.Msg, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return conn.jetstream.ChanQueueSubscribe(subject, queue, ch, opts...)
+	return conn.jetstream.ChanQueueSubscribe(subject, queue, ch, append(opts, nats.Context(ctx))...)
 }
 
 /*
@@ -208,7 +208,7 @@ func (conn *connection) QueueSubscribe(ctx context.Context, subject string, queu
 		cb(ctx, msg)
 	}
 
-	return conn.jetstream.QueueSubscribe(subject, queue, wrapped, opts...)
+	return conn.jetstream.QueueSubscribe(subject, queue, wrapped, append(opts, nats.Context(ctx))...)
 }
 
 /*
@@ -216,14 +216,14 @@ QueueSubscribeSync creates a nats.Subscription with a queue group that can be
 used to process messages synchronously.
 */
 func (conn *connection) QueueSubscribeSync(ctx context.Context, subject string, queue string, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return conn.jetstream.QueueSubscribeSync(subject, queue, opts...)
+	return conn.jetstream.QueueSubscribeSync(subject, queue, append(opts, nats.Context(ctx))...)
 }
 
 /*
 PullSubscribe creates a nats.Subscription that can fetch messages.
 */
 func (conn *connection) PullSubscribe(ctx context.Context, subject string, durable string, opts ...nats.SubOpt) (*nats.Subscription, error) {
-	return conn.jetstream.PullSubscribe(subject, durable, opts...)
+	return conn.jetstream.PullSubscribe(subject, durable, append(opts, nats.Context(ctx))...)
 }
 
 /*
@@ -232,7 +232,7 @@ AddStream creates a stream.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) AddStream(ctx context.Context, cfg *nats.StreamConfig, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AddStream", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AddStream", humanized))
 	defer span.End()
 
 	var err error
@@ -242,7 +242,7 @@ func (conn *connection) AddStream(ctx context.Context, cfg *nats.StreamConfig, o
 		}
 	}()
 
-	info, err := conn.jetstream.AddStream(cfg, opts...)
+	info, err := conn.jetstream.AddStream(cfg, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, cfg)
 
 	return info, err
@@ -254,7 +254,7 @@ UpdateStream updates a stream.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) UpdateStream(ctx context.Context, cfg *nats.StreamConfig, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: UpdateStream", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: UpdateStream", humanized))
 	defer span.End()
 
 	var err error
@@ -264,7 +264,7 @@ func (conn *connection) UpdateStream(ctx context.Context, cfg *nats.StreamConfig
 		}
 	}()
 
-	info, err := conn.jetstream.UpdateStream(cfg, opts...)
+	info, err := conn.jetstream.UpdateStream(cfg, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, cfg)
 
 	return info, err
@@ -276,7 +276,7 @@ DeleteStream deletes a stream.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) DeleteStream(ctx context.Context, stream string, opts ...nats.JSOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: DeleteStream", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: DeleteStream", humanized))
 	defer span.End()
 
 	var err error
@@ -286,7 +286,7 @@ func (conn *connection) DeleteStream(ctx context.Context, stream string, opts ..
 		}
 	}()
 
-	err = conn.jetstream.DeleteStream(stream, opts...)
+	err = conn.jetstream.DeleteStream(stream, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name: stream,
 	})
@@ -300,7 +300,7 @@ StreamInfo retrieves information from a stream.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) StreamInfo(ctx context.Context, stream string, opts ...nats.JSOpt) (*nats.StreamInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: StreamInfo", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: StreamInfo", humanized))
 	defer span.End()
 
 	var err error
@@ -310,7 +310,7 @@ func (conn *connection) StreamInfo(ctx context.Context, stream string, opts ...n
 		}
 	}()
 
-	info, err := conn.jetstream.StreamInfo(stream, opts...)
+	info, err := conn.jetstream.StreamInfo(stream, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name: stream,
 	})
@@ -324,7 +324,7 @@ PurgeStream purges a stream messages.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) PurgeStream(ctx context.Context, stream string, opts ...nats.JSOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: PurgeStream", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: PurgeStream", humanized))
 	defer span.End()
 
 	var err error
@@ -334,7 +334,7 @@ func (conn *connection) PurgeStream(ctx context.Context, stream string, opts ...
 		}
 	}()
 
-	err = conn.jetstream.PurgeStream(stream, opts...)
+	err = conn.jetstream.PurgeStream(stream, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name: stream,
 	})
@@ -346,14 +346,14 @@ func (conn *connection) PurgeStream(ctx context.Context, stream string, opts ...
 Streams can be used to retrieve a list of nats.StreamInfo objects.
 */
 func (conn *connection) Streams(ctx context.Context, opts ...nats.JSOpt) <-chan *nats.StreamInfo {
-	return conn.jetstream.Streams(opts...)
+	return conn.jetstream.Streams(append(opts, nats.Context(ctx))...)
 }
 
 /*
 StreamNames is used to retrieve a list of stream names.
 */
 func (conn *connection) StreamNames(ctx context.Context, opts ...nats.JSOpt) <-chan string {
-	return conn.jetstream.StreamNames(opts...)
+	return conn.jetstream.StreamNames(append(opts, nats.Context(ctx))...)
 }
 
 /*
@@ -365,7 +365,7 @@ been created/updated with the AllowDirect boolean.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) GetMsg(ctx context.Context, stream string, seq uint64, opts ...nats.JSOpt) (*nats.RawStreamMsg, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: GetMsg", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: GetMsg", humanized))
 	defer span.End()
 
 	var err error
@@ -375,7 +375,7 @@ func (conn *connection) GetMsg(ctx context.Context, stream string, seq uint64, o
 		}
 	}()
 
-	raw, err := conn.jetstream.GetMsg(stream, seq, opts...)
+	raw, err := conn.jetstream.GetMsg(stream, seq, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name: stream,
 	})
@@ -392,7 +392,7 @@ the AllowDirect boolean.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) GetLastMsg(ctx context.Context, stream string, subject string, opts ...nats.JSOpt) (*nats.RawStreamMsg, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: GetLastMsg", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: GetLastMsg", humanized))
 	defer span.End()
 
 	var err error
@@ -402,7 +402,7 @@ func (conn *connection) GetLastMsg(ctx context.Context, stream string, subject s
 		}
 	}()
 
-	raw, err := conn.jetstream.GetLastMsg(stream, subject, opts...)
+	raw, err := conn.jetstream.GetLastMsg(stream, subject, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name:     stream,
 		Subjects: []string{subject},
@@ -418,7 +418,7 @@ its value is not overwritten.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) DeleteMsg(ctx context.Context, stream string, seq uint64, opts ...nats.JSOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: DeleteMsg", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: DeleteMsg", humanized))
 	defer span.End()
 
 	var err error
@@ -428,7 +428,7 @@ func (conn *connection) DeleteMsg(ctx context.Context, stream string, seq uint64
 		}
 	}()
 
-	err = conn.jetstream.DeleteMsg(stream, seq, opts...)
+	err = conn.jetstream.DeleteMsg(stream, seq, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name: stream,
 	})
@@ -443,7 +443,7 @@ with random data As a result, this operation is slower than DeleteMsg().
 It automatically handles tracing and error recording.
 */
 func (conn *connection) SecureDeleteMsg(ctx context.Context, stream string, seq uint64, opts ...nats.JSOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: SecureDeleteMsg", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: SecureDeleteMsg", humanized))
 	defer span.End()
 
 	var err error
@@ -453,7 +453,7 @@ func (conn *connection) SecureDeleteMsg(ctx context.Context, stream string, seq 
 		}
 	}()
 
-	err = conn.jetstream.SecureDeleteMsg(stream, seq, opts...)
+	err = conn.jetstream.SecureDeleteMsg(stream, seq, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name: stream,
 	})
@@ -467,7 +467,7 @@ AddConsumer adds a consumer to a stream.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) AddConsumer(ctx context.Context, stream string, cfg *nats.ConsumerConfig, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AddConsumer", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AddConsumer", humanized))
 	defer span.End()
 
 	var err error
@@ -477,7 +477,7 @@ func (conn *connection) AddConsumer(ctx context.Context, stream string, cfg *nat
 		}
 	}()
 
-	info, err := conn.jetstream.AddConsumer(stream, cfg, opts...)
+	info, err := conn.jetstream.AddConsumer(stream, cfg, append(opts, nats.Context(ctx))...)
 	setConsumerAttributes(span, stream, cfg)
 
 	return info, err
@@ -489,7 +489,7 @@ UpdateConsumer updates an existing consumer.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) UpdateConsumer(ctx context.Context, stream string, cfg *nats.ConsumerConfig, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: UpdateConsumer", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: UpdateConsumer", humanized))
 	defer span.End()
 
 	var err error
@@ -499,7 +499,7 @@ func (conn *connection) UpdateConsumer(ctx context.Context, stream string, cfg *
 		}
 	}()
 
-	info, err := conn.jetstream.UpdateConsumer(stream, cfg, opts...)
+	info, err := conn.jetstream.UpdateConsumer(stream, cfg, append(opts, nats.Context(ctx))...)
 	setConsumerAttributes(span, stream, cfg)
 
 	return info, err
@@ -511,7 +511,7 @@ DeleteConsumer deletes a consumer.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) DeleteConsumer(ctx context.Context, stream string, name string, opts ...nats.JSOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: DeleteConsumer", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: DeleteConsumer", humanized))
 	defer span.End()
 
 	var err error
@@ -521,7 +521,7 @@ func (conn *connection) DeleteConsumer(ctx context.Context, stream string, name 
 		}
 	}()
 
-	err = conn.jetstream.DeleteConsumer(stream, name, opts...)
+	err = conn.jetstream.DeleteConsumer(stream, name, append(opts, nats.Context(ctx))...)
 	setConsumerAttributes(span, stream, &nats.ConsumerConfig{
 		Name: name,
 	})
@@ -535,7 +535,7 @@ ConsumerInfo retrieves information of a consumer from a stream.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) ConsumerInfo(ctx context.Context, stream string, name string, opts ...nats.JSOpt) (*nats.ConsumerInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: ConsumerInfo", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: ConsumerInfo", humanized))
 	defer span.End()
 
 	var err error
@@ -545,7 +545,7 @@ func (conn *connection) ConsumerInfo(ctx context.Context, stream string, name st
 		}
 	}()
 
-	info, err := conn.jetstream.ConsumerInfo(stream, name, opts...)
+	info, err := conn.jetstream.ConsumerInfo(stream, name, append(opts, nats.Context(ctx))...)
 	setConsumerAttributes(span, stream, &nats.ConsumerConfig{
 		Name: name,
 	})
@@ -557,14 +557,14 @@ func (conn *connection) ConsumerInfo(ctx context.Context, stream string, name st
 Consumers is used to retrieve a list of nats.ConsumerInfo objects.
 */
 func (conn *connection) Consumers(ctx context.Context, stream string, opts ...nats.JSOpt) <-chan *nats.ConsumerInfo {
-	return conn.jetstream.Consumers(stream, opts...)
+	return conn.jetstream.Consumers(stream, append(opts, nats.Context(ctx))...)
 }
 
 /*
 ConsumerNames is used to retrieve a list of consumer names.
 */
 func (conn *connection) ConsumerNames(ctx context.Context, stream string, opts ...nats.JSOpt) <-chan string {
-	return conn.jetstream.ConsumerNames(stream, opts...)
+	return conn.jetstream.ConsumerNames(stream, append(opts, nats.Context(ctx))...)
 }
 
 /*
@@ -573,7 +573,7 @@ AccountInfo retrieves info about the NATS JetStream usage from an account.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) AccountInfo(ctx context.Context, opts ...nats.JSOpt) (*nats.AccountInfo, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AccountInfo", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: AccountInfo", humanized))
 	defer span.End()
 
 	var err error
@@ -583,7 +583,7 @@ func (conn *connection) AccountInfo(ctx context.Context, opts ...nats.JSOpt) (*n
 		}
 	}()
 
-	info, err := conn.jetstream.AccountInfo(opts...)
+	info, err := conn.jetstream.AccountInfo(append(opts, nats.Context(ctx))...)
 	return info, err
 }
 
@@ -593,7 +593,7 @@ StreamNameBySubject returns a stream matching given subject.
 It automatically handles tracing and error recording.
 */
 func (conn *connection) StreamNameBySubject(ctx context.Context, subject string, opts ...nats.JSOpt) (string, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: StreamNameBySubject", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: StreamNameBySubject", humanized))
 	defer span.End()
 
 	var err error
@@ -603,7 +603,7 @@ func (conn *connection) StreamNameBySubject(ctx context.Context, subject string,
 		}
 	}()
 
-	name, err := conn.jetstream.StreamNameBySubject(subject, opts...)
+	name, err := conn.jetstream.StreamNameBySubject(subject, append(opts, nats.Context(ctx))...)
 	setStreamAttributes(span, &nats.StreamConfig{
 		Name:     name,
 		Subjects: []string{subject},

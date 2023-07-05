@@ -48,7 +48,7 @@ To delete an older version, use DeleteVersions.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Delete(ctx context.Context, secretpath string) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Delete", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Delete", humanized))
 	defer span.End()
 
 	var err error
@@ -71,7 +71,7 @@ DeleteMetadata deletes all versions and metadata of the secret at the given path
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) DeleteMetadata(ctx context.Context, secretpath string) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / DeleteMetadata", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / DeleteMetadata", humanized))
 	defer span.End()
 
 	var err error
@@ -95,7 +95,7 @@ engine. To delete the latest version of a secret, just use Delete.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) DeleteVersions(ctx context.Context, secretpath string, versions []int) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / DeleteVersions", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / DeleteVersions", humanized))
 	defer span.End()
 
 	var err error
@@ -121,7 +121,7 @@ A list of existing versions can be retrieved using the GetVersionsAsList method.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Destroy(ctx context.Context, secretpath string, versions []int) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Destroy", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Destroy", humanized))
 	defer span.End()
 
 	var err error
@@ -148,7 +148,7 @@ deletion time.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Get(ctx context.Context, secretpath string) (*api.KVSecret, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Get", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Get", humanized))
 	defer span.End()
 
 	var err error
@@ -172,7 +172,7 @@ existing versions and their respective creation/deletion times, etc.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) GetMetadata(ctx context.Context, secretpath string) (*api.KVMetadata, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetMetadata", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetMetadata", humanized))
 	defer span.End()
 
 	var err error
@@ -202,7 +202,7 @@ while the response from GetMetadata contains them as a map.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) GetVersion(ctx context.Context, secretpath string, version int) (*api.KVSecret, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetVersion", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetVersion", humanized))
 	defer span.End()
 
 	var err error
@@ -226,7 +226,7 @@ sorted by version number.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) GetVersionsAsList(ctx context.Context, secretpath string) ([]api.KVVersionMetadata, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetVersionsAsList", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetVersionsAsList", humanized))
 	defer span.End()
 
 	var err error
@@ -251,7 +251,7 @@ the key-value pairs that are new or changing need to be provided.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Patch(ctx context.Context, secretpath string, data map[string]any) (*api.KVSecret, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Patch", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Patch", humanized))
 	defer span.End()
 
 	var err error
@@ -276,7 +276,7 @@ on the previous metadata.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) PatchMetadata(ctx context.Context, secretpath string, metadata api.KVMetadataPatchInput) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / PatchMetadata", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / PatchMetadata", humanized))
 	defer span.End()
 
 	var err error
@@ -303,7 +303,7 @@ list of available versions.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Put(ctx context.Context, secretpath string, data map[string]any) (*api.KVSecret, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Put", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Put", humanized))
 	defer span.End()
 
 	var err error
@@ -334,7 +334,7 @@ secret data yet.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) PutMetadata(ctx context.Context, secretpath string, metadata api.KVMetadataPutInput) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / PutMetadata", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / PutMetadata", humanized))
 	defer span.End()
 
 	var err error
@@ -358,7 +358,7 @@ version. That previous version becomes the next / newest version for the path.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Rollback(ctx context.Context, secretpath string, toVersion int) (*api.KVSecret, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Rollback", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Rollback", humanized))
 	defer span.End()
 
 	var err error
@@ -384,7 +384,7 @@ A list of existing versions can be retrieved using the GetVersionsAsList method.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Undelete(ctx context.Context, secretpath string, versions []int) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Undelete", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Undelete", humanized))
 	defer span.End()
 
 	var err error
