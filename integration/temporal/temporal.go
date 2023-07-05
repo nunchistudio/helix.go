@@ -69,6 +69,7 @@ func Connect(cfg Config) (Client, Worker, error) {
 	// Set TLS options only if enabled in Config.
 	if cfg.TLS.Enabled {
 		var validations []errorstack.Validation
+
 		opts.ConnectionOptions.TLS, validations = cfg.TLS.ToStandardTLS()
 		if len(validations) > 0 {
 			stack.WithValidations(validations...)

@@ -79,7 +79,12 @@ func Connect(cfg Config) (PostgreSQL, error) {
 
 	// Set TLS options only if enabled in Config.
 	if cfg.TLS.Enabled {
-		opts.Config.TLSConfig, stack.Validations = cfg.TLS.ToStandardTLS()
+		var validations []errorstack.Validation
+
+		opts.Config.TLSConfig, validations = cfg.TLS.ToStandardTLS()
+		if len(validations) > 0 {
+			stack.WithValidations(validations...)
+		}
 	}
 
 	// Try to connect to the PostgreSQL servers.
