@@ -19,5 +19,6 @@ scopes:
   - "postgres"
   - "rest"
   - "service"
+  - "temporal"
   - "tracer"
   - "vault"

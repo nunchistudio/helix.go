@@ -13,6 +13,7 @@ body:
         - nats
         - postgres
         - rest
+        - temporal
         - vault
   - type: textarea
     attributes:
