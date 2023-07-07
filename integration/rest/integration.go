@@ -84,3 +84,10 @@ func (r *rest) Close(ctx context.Context) error {
 
 	return nil
 }
+
+/*
+Status always returns a `200` status.
+*/
+func (r *rest) Status(ctx context.Context) (int, error) {
+	return 200, nil
+}

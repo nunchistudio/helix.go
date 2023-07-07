@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"go.nunchi.studio/helix/errorstack"
+	"go.nunchi.studio/helix/service"
 
 	"github.com/uptrace/bunrouter"
 )
@@ -61,6 +62,8 @@ func (r *rest) handlerHealthcheck(rw http.ResponseWriter, req bunrouter.Request)
 	var status int = http.StatusOK
 	if r.config.Healthcheck != nil {
 		status = r.config.Healthcheck(req.Request)
+	} else {
+		status, _ = service.Status(req.Context())
 	}
 
 	res := &Response{

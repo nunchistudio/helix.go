@@ -34,3 +34,16 @@ func (conn *connection) Close(ctx context.Context) error {
 
 	return nil
 }
+
+/*
+Status indicates if the integration is able to connect to the NATS server or not.
+Returns `200` if connection is in a proper state, `503` otherwise.
+*/
+func (conn *connection) Status(ctx context.Context) (int, error) {
+	var status int = 503
+	if conn.nats.Status().String() == "CONNECTED" {
+		status = 200
+	}
+
+	return status, nil
+}

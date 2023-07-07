@@ -47,8 +47,6 @@ type Client interface {
 	DescribeTaskQueue(ctx context.Context, taskqueue string, taskqueueType enums.TaskQueueType) (*workflowservice.DescribeTaskQueueResponse, error)
 	ResetWorkflowExecution(ctx context.Context, request *workflowservice.ResetWorkflowExecutionRequest) (*workflowservice.ResetWorkflowExecutionResponse, error)
 
-	CheckHealth(ctx context.Context, request *client.CheckHealthRequest) (*client.CheckHealthResponse, error)
-
 	ScheduleClient() ScheduleClient
 }
 
@@ -539,29 +537,6 @@ func (c *iclient) ResetWorkflowExecution(ctx context.Context, request *workflows
 			workflowRunID: request.WorkflowExecution.RunId,
 		})
 	}
-
-	return res, err
-}
-
-/*
-CheckHealth performs a server health check using the gRPC health check API. If the
-check fails, an error is returned.
-
-It automatically handles tracing and error recording.
-*/
-func (c *iclient) CheckHealth(ctx context.Context, request *client.CheckHealthRequest) (*client.CheckHealthResponse, error) {
-	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: CheckHealth", humanized))
-	defer span.End()
-
-	var err error
-	defer func() {
-		if err != nil {
-			span.RecordError("failed to check health", err)
-		}
-	}()
-
-	res, err := c.client.CheckHealth(ctx, request)
-	setDefaultAttributes(span, c.config)
 
 	return res, err
 }

@@ -26,4 +26,10 @@ type Integration interface {
 
 	// Close closes the connection with the integration, if applicable.
 	Close(ctx context.Context) error
+
+	// Status executes a health check of the integration. It returns an equivalent
+	// HTTP status code of the health. It should most likely be `200` or `503`.
+	// If the integration is unhealthy, it may return an error as well depending
+	// on the underlying client.
+	Status(ctx context.Context) (int, error)
 }
