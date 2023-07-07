@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"os"
 	"os/signal"
 	"sync"
@@ -164,16 +165,20 @@ func Close() error {
 		}
 	}
 
+	// Ignore if the error is ENOTTY, as explained in this comment on GitHub:
+	// https://github.com/uber-go/zap/issues/991#issuecomment-962098428.
 	if logger.Logger() != nil {
 		if err := logger.Logger().Sync(); err != nil {
-			stack.WithChildren(&errorstack.Error{
-				Message: "Failed to gracefully drain/close logger",
-				Validations: []errorstack.Validation{
-					{
-						Message: err.Error(),
+			if !errors.Is(err, syscall.ENOTTY) {
+				stack.WithChildren(&errorstack.Error{
+					Message: "Failed to gracefully drain/close logger",
+					Validations: []errorstack.Validation{
+						{
+							Message: err.Error(),
+						},
 					},
-				},
-			})
+				})
+			}
 		}
 	}
 
