@@ -27,7 +27,17 @@ func main() {
     return err
   }
 
-  router.POST("/anything", func(rw http.ResponseWriter, req *http.Request) {
+  router.POST("/users/:id", func(rw http.ResponseWriter, req *http.Request) {
+    params, ok := rest.ParamsFromContext(req.Context())
+    if !ok {
+      handlerfunc.NotFound(rw, req)
+      return
+    }
+
+    userID := params["id"]
+    
+    // ...
+    
     handlerfunc.Accepted(rw, req)
   })
 
