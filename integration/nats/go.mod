@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/nats-io/nats.go v1.28.0
 	github.com/stretchr/testify v1.8.4
-	go.nunchi.studio/helix v0.13.0
+	go.nunchi.studio/helix v0.13.1
 	go.opentelemetry.io/otel v1.16.0
 )
 
@@ -40,5 +40,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../

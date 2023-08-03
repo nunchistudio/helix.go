@@ -8,7 +8,7 @@ require (
 	github.com/uptrace/bunrouter v1.0.20
 	github.com/uptrace/bunrouter/extra/bunrouterotel v1.0.20
 	github.com/uptrace/bunrouter/extra/reqlog v1.0.20
-	go.nunchi.studio/helix v0.13.0
+	go.nunchi.studio/helix v0.13.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.0
 )
 
@@ -52,5 +52,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../
