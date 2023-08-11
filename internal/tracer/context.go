@@ -2,6 +2,7 @@ package tracer
 
 import (
 	"context"
+	"strings"
 
 	"go.nunchi.studio/helix/event"
 
@@ -23,9 +24,15 @@ func FromContextToBaggageMembers(ctx context.Context) []baggage.Member {
 	}
 
 	// Transform the nasted object to a flatten map of string. It is a required
-	// step to pass them from service to service.
+	// step to pass them from service to service. This also replaces keys part of
+	// an array (to be compatible with Baggage specificiation), such as transforming
+	// "event.subscriptions[0].id" to "event.subscriptions.0.id".
 	mapped := event.ToFlatMap(ectx)
 	for k, v := range mapped {
+		k = strings.ReplaceAll(k, "[", ".")
+		k = strings.ReplaceAll(k, "].", ".")
+		k = strings.ReplaceAll(k, "]", "")
+
 		m, err := baggage.NewMember(k, v)
 		if err == nil {
 			members = append(members, m)

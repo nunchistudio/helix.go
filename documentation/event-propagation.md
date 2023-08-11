@@ -16,11 +16,13 @@ router.POST("/anything", func(rw http.ResponseWriter, req *http.Request) {
   var e = event.Event{
     Name:   "post.anything",
     UserID: "7469e788-617a-4b6a-8a26-a61f6acd01d3",
-    Subscription: event.Subscription{
-      CustomerID:  "2658da04-7c8f-4a7e-9ab0-d5d555b8173e",
-      PlanID:      "7781028b-eb48-410d-8cae-c36cffed663d",
-      Usage:       "api.requests",
-      IncrementBy: 1.0,
+    Subscriptions: []event.Subscription{
+      {
+        CustomerID:  "2658da04-7c8f-4a7e-9ab0-d5d555b8173e",
+        PlanID:      "7781028b-eb48-410d-8cae-c36cffed663d",
+        Usage:       "api.requests",
+        IncrementBy: 1.0,
+      },
     },
   }
 

@@ -1,6 +1,8 @@
 package trace
 
 import (
+	"fmt"
+
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -73,8 +75,10 @@ func (s *Span) SetStringAttribute(key string, value string) {
 /*
 SetSliceStringAttribute sets a slice of string attributes to the span.
 */
-func (s *Span) SetSliceStringAttribute(key string, value []string) {
-	s.client.SetAttributes(attribute.StringSlice(key, value))
+func (s *Span) SetSliceStringAttribute(key string, values []string) {
+	for i, value := range values {
+		s.client.SetAttributes(attribute.String(fmt.Sprintf("%s[%d]", key, i), value))
+	}
 }
 
 /*
