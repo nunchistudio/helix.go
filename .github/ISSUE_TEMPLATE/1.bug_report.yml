@@ -8,7 +8,7 @@ body:
     attributes:
       label: What helix version are you using?
       options:
-        - 0.13.x
+        - 0.14.x
     validations:
       required: true
   - type: dropdown
@@ -32,6 +32,7 @@ body:
     attributes:
       label: What Go version are you running?
       options:
+        - 1.21.x
         - 1.20.x
         - 1.19.x
         - 1.18.x
