@@ -36,6 +36,7 @@ type Event struct {
 	IsAnonymous   bool              `json:"is_anonymous"`
 	UserID        string            `json:"user_id,omitempty"`
 	GroupID       string            `json:"group_id,omitempty"`
+	TenantID      string            `json:"tenant_id,omitempty"`
 	IP            net.IP            `json:"ip,omitempty"`
 	UserAgent     string            `json:"user_agent,omitempty"`
 	Locale        string            `json:"locale,omitempty"`
@@ -85,6 +86,7 @@ func injectEventToFlatMap(e Event, flatten map[string]string) {
 	flatten["event.is_anonymous"] = strconv.FormatBool(e.IsAnonymous)
 	flatten["event.user_id"] = e.UserID
 	flatten["event.group_id"] = e.GroupID
+	flatten["event.tenant_id"] = e.TenantID
 	flatten["event.ip"] = e.IP.String()
 	flatten["event.user_agent"] = e.UserAgent
 	flatten["event.locale"] = e.Locale
@@ -158,6 +160,8 @@ func extractEventFromBaggage(b baggage.Baggage) Event {
 			e.UserID = b.Member("event.user_id").Value()
 		case "group_id":
 			e.GroupID = b.Member("event.group_id").Value()
+		case "tenant_id":
+			e.TenantID = b.Member("event.tenant_id").Value()
 		case "ip":
 			e.IP = net.ParseIP(b.Member("event.ip").Value())
 		case "user_agent":
