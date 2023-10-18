@@ -10,6 +10,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 /*
@@ -19,11 +20,9 @@ automatic distributed tracing as well as error recording within traces.
 type PostgreSQL interface {
 	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (Tx, error)
 	Exec(ctx context.Context, query string, args ...any) (pgconn.CommandTag, error)
-	Prepare(ctx context.Context, id string, query string) (*pgconn.StatementDescription, error)
 	Query(ctx context.Context, query string, args ...any) (pgx.Rows, error)
 	QueryRow(ctx context.Context, query string, args ...any) pgx.Row
 	SendBatch(ctx context.Context, batch *pgx.Batch) pgx.BatchResults
-	WaitForNotification(ctx context.Context) (*pgconn.Notification, error)
 }
 
 /*
@@ -36,7 +35,7 @@ type connection struct {
 	config *Config
 
 	// client is the connection made with the PostgreSQL server.
-	client *pgx.Conn
+	client *pgxpool.Pool
 }
 
 /*
@@ -59,7 +58,7 @@ func Connect(cfg Config) (PostgreSQL, error) {
 
 	// Set the default PostgreSQL options.
 	address := fmt.Sprintf("postgres://%s:%s@%s/%s", cfg.User, cfg.Password, cfg.Address, cfg.Database)
-	opts, err := pgx.ParseConfig(address)
+	opts, err := pgxpool.ParseConfig(address)
 	if err != nil {
 		stack.WithValidations(errorstack.Validation{
 			Message: normalizeErrorMessage(err),
@@ -72,7 +71,7 @@ func Connect(cfg Config) (PostgreSQL, error) {
 	// the underlying PostgreSQL connection, but also so one day we could potentially
 	// add logic such as tracing.
 	if cfg.OnNotification != nil {
-		opts.OnNotification = func(pc *pgconn.PgConn, notif *pgconn.Notification) {
+		opts.ConnConfig.OnNotification = func(pc *pgconn.PgConn, notif *pgconn.Notification) {
 			cfg.OnNotification(notif)
 		}
 	}
@@ -81,14 +80,14 @@ func Connect(cfg Config) (PostgreSQL, error) {
 	if cfg.TLS.Enabled {
 		var validations []errorstack.Validation
 
-		opts.Config.TLSConfig, validations = cfg.TLS.ToStandardTLS()
+		opts.ConnConfig.TLSConfig, validations = cfg.TLS.ToStandardTLS()
 		if len(validations) > 0 {
 			stack.WithValidations(validations...)
 		}
 	}
 
 	// Try to connect to the PostgreSQL servers.
-	conn.client, err = pgx.ConnectConfig(context.Background(), opts)
+	conn.client, err = pgxpool.NewWithConfig(context.Background(), opts)
 	if err != nil {
 		stack.WithValidations(errorstack.Validation{
 			Message: normalizeErrorMessage(err),
@@ -155,35 +154,6 @@ func (conn *connection) Exec(ctx context.Context, query string, args ...any) (pg
 	}()
 
 	stmt, err := conn.client.Exec(ctx, query, args...)
-	setDefaultAttributes(span, conn.config)
-	setQueryAttributes(span, query)
-
-	return stmt, err
-}
-
-/*
-Prepare creates a prepared statement with a unique name. The query can contain
-placeholders or bound parameters. These placeholders are referenced positional
-as $1, $2, etc.
-
-Prepare is idempotent: it is safe to call Prepare multiple times with the same
-name and query arguments. This allows a code path to Prepare and Query/Exec
-without concern for if the statement has already been prepared.
-
-It automatically handles tracing and error recording.
-*/
-func (conn *connection) Prepare(ctx context.Context, id string, query string) (*pgconn.StatementDescription, error) {
-	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Prepare", humanized))
-	defer span.End()
-
-	var err error
-	defer func() {
-		if err != nil {
-			span.RecordError("failed to prepare statement", err)
-		}
-	}()
-
-	stmt, err := conn.client.Prepare(ctx, id, query)
 	setDefaultAttributes(span, conn.config)
 	setQueryAttributes(span, query)
 
@@ -266,26 +236,4 @@ func (conn *connection) SendBatch(ctx context.Context, batch *pgx.Batch) pgx.Bat
 	setBatchAttributes(span, batch)
 
 	return br
-}
-
-/*
-WaitForNotification waits for a PostgreSQL notification.
-
-It automatically handles tracing and error recording.
-*/
-func (conn *connection) WaitForNotification(ctx context.Context) (*pgconn.Notification, error) {
-	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: WaitForNotification", humanized))
-	defer span.End()
-
-	var err error
-	defer func() {
-		if err != nil {
-			span.RecordError("failed to wait for notification", err)
-		}
-	}()
-
-	notif, err := conn.client.WaitForNotification(ctx)
-	setDefaultAttributes(span, conn.config)
-
-	return notif, err
 }
