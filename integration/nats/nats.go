@@ -8,6 +8,7 @@ import (
 	"go.nunchi.studio/helix/service"
 
 	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 /*
@@ -22,9 +23,9 @@ type connection struct {
 	// nats is the connection made with the NATS server.
 	nats *nats.Conn
 
-	// jetstream is the JetStream context returned by the NATS client, allowing
+	// jetstream is the JetStream instance returned by the NATS client, allowing
 	// JetStream messaging and stream management.
-	jetstream nats.JetStreamContext
+	jetstream jetstream.JetStream
 }
 
 /*
@@ -72,9 +73,9 @@ func Connect(cfg Config) (JetStream, error) {
 		return nil, stack
 	}
 
-	// Try to return a JetStream context from NATS. Stop here if error validations
+	// Try to return a JetStream instance from NATS. Stop here if error validations
 	// were encountered.
-	conn.jetstream, err = conn.nats.JetStream()
+	conn.jetstream, err = jetstream.New(conn.nats)
 	if err != nil {
 		stack.WithValidations(errorstack.Validation{
 			Message: normalizeErrorMessage(err),

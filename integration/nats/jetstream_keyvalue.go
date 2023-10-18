@@ -6,7 +6,7 @@ import (
 
 	"go.nunchi.studio/helix/telemetry/trace"
 
-	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 /*
@@ -15,7 +15,7 @@ key-value functions for automatic tracing and error recording.
 */
 type keyvalue struct {
 	bucket string
-	store  nats.KeyValue
+	store  jetstream.KeyValue
 }
 
 /*
@@ -26,19 +26,19 @@ within traces.
 */
 type KeyValue interface {
 	Bucket(ctx context.Context) string
-	Get(ctx context.Context, key string) (nats.KeyValueEntry, error)
-	GetRevision(ctx context.Context, key string, revision uint64) (nats.KeyValueEntry, error)
+	Get(ctx context.Context, key string) (jetstream.KeyValueEntry, error)
+	GetRevision(ctx context.Context, key string, revision uint64) (jetstream.KeyValueEntry, error)
 	Create(ctx context.Context, key string, value []byte) (uint64, error)
 	Put(ctx context.Context, key string, value []byte) (uint64, error)
-	Update(ctx context.Context, key string, value []byte, last uint64) (uint64, error)
-	Delete(ctx context.Context, key string, opts ...nats.DeleteOpt) error
-	Purge(ctx context.Context, key string, opts ...nats.DeleteOpt) error
-	PurgeDeletes(ctx context.Context, opts ...nats.PurgeOpt) error
-	Watch(ctx context.Context, keys string, opts ...nats.WatchOpt) (nats.KeyWatcher, error)
-	WatchAll(ctx context.Context, opts ...nats.WatchOpt) (nats.KeyWatcher, error)
-	Keys(ctx context.Context, opts ...nats.WatchOpt) ([]string, error)
-	History(ctx context.Context, key string, opts ...nats.WatchOpt) ([]nats.KeyValueEntry, error)
-	Status(ctx context.Context) (nats.KeyValueStatus, error)
+	Update(ctx context.Context, key string, value []byte, revision uint64) (uint64, error)
+	Delete(ctx context.Context, key string, opts ...jetstream.KVDeleteOpt) error
+	Purge(ctx context.Context, key string, opts ...jetstream.KVDeleteOpt) error
+	PurgeDeletes(ctx context.Context, opts ...jetstream.KVPurgeOpt) error
+	Watch(ctx context.Context, keys string, opts ...jetstream.WatchOpt) (jetstream.KeyWatcher, error)
+	WatchAll(ctx context.Context, opts ...jetstream.WatchOpt) (jetstream.KeyWatcher, error)
+	Keys(ctx context.Context, opts ...jetstream.WatchOpt) ([]string, error)
+	History(ctx context.Context, key string, opts ...jetstream.WatchOpt) ([]jetstream.KeyValueEntry, error)
+	Status(ctx context.Context) (jetstream.KeyValueStatus, error)
 }
 
 /*
@@ -53,8 +53,8 @@ Get returns the latest value for the key.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) Get(ctx context.Context, key string) (nats.KeyValueEntry, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Get", humanized))
+func (kv *keyvalue) Get(ctx context.Context, key string) (jetstream.KeyValueEntry, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Get", humanized))
 	defer span.End()
 
 	var err error
@@ -64,8 +64,8 @@ func (kv *keyvalue) Get(ctx context.Context, key string) (nats.KeyValueEntry, er
 		}
 	}()
 
-	entry, err := kv.store.Get(key)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	entry, err := kv.store.Get(ctx, key)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -77,8 +77,8 @@ GetRevision returns a specific revision value for the key.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) GetRevision(ctx context.Context, key string, revision uint64) (nats.KeyValueEntry, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetRevision", humanized))
+func (kv *keyvalue) GetRevision(ctx context.Context, key string, revision uint64) (jetstream.KeyValueEntry, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / GetRevision", humanized))
 	defer span.End()
 
 	var err error
@@ -88,8 +88,8 @@ func (kv *keyvalue) GetRevision(ctx context.Context, key string, revision uint64
 		}
 	}()
 
-	entry, err := kv.store.GetRevision(key, revision)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	entry, err := kv.store.GetRevision(ctx, key, revision)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -103,7 +103,7 @@ associated.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Create(ctx context.Context, key string, value []byte) (uint64, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Create", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Create", humanized))
 	defer span.End()
 
 	var err error
@@ -113,8 +113,8 @@ func (kv *keyvalue) Create(ctx context.Context, key string, value []byte) (uint6
 		}
 	}()
 
-	revision, err := kv.store.Create(key, value)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	revision, err := kv.store.Create(ctx, key, value)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -128,7 +128,7 @@ associated.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Put(ctx context.Context, key string, value []byte) (uint64, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Put", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Put", humanized))
 	defer span.End()
 
 	var err error
@@ -138,8 +138,8 @@ func (kv *keyvalue) Put(ctx context.Context, key string, value []byte) (uint64, 
 		}
 	}()
 
-	revision, err := kv.store.Put(key, value)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	revision, err := kv.store.Put(ctx, key, value)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -153,7 +153,7 @@ associated.
 It automatically handles tracing and error recording.
 */
 func (kv *keyvalue) Update(ctx context.Context, key string, value []byte, last uint64) (uint64, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Update", humanized))
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Update", humanized))
 	defer span.End()
 
 	var err error
@@ -163,8 +163,8 @@ func (kv *keyvalue) Update(ctx context.Context, key string, value []byte, last u
 		}
 	}()
 
-	revision, err := kv.store.Update(key, value, last)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	revision, err := kv.store.Update(ctx, key, value, last)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -176,8 +176,8 @@ Delete will place a delete marker and leave all revisions.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) Delete(ctx context.Context, key string, opts ...nats.DeleteOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Delete", humanized))
+func (kv *keyvalue) Delete(ctx context.Context, key string, opts ...jetstream.KVDeleteOpt) error {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Delete", humanized))
 	defer span.End()
 
 	var err error
@@ -187,8 +187,8 @@ func (kv *keyvalue) Delete(ctx context.Context, key string, opts ...nats.DeleteO
 		}
 	}()
 
-	err = kv.store.Delete(key, opts...)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	err = kv.store.Delete(ctx, key, opts...)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -201,8 +201,8 @@ Purge will place a delete marker and remove all previous revisions.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) Purge(ctx context.Context, key string, opts ...nats.DeleteOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Purge", humanized))
+func (kv *keyvalue) Purge(ctx context.Context, key string, opts ...jetstream.KVDeleteOpt) error {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Purge", humanized))
 	defer span.End()
 
 	var err error
@@ -212,8 +212,8 @@ func (kv *keyvalue) Purge(ctx context.Context, key string, opts ...nats.DeleteOp
 		}
 	}()
 
-	err = kv.store.Purge(key, opts...)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	err = kv.store.Purge(ctx, key, opts...)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -225,8 +225,8 @@ PurgeDeletes will remove all current delete markers.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) PurgeDeletes(ctx context.Context, opts ...nats.PurgeOpt) error {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / PurgeDeletes", humanized))
+func (kv *keyvalue) PurgeDeletes(ctx context.Context, opts ...jetstream.KVPurgeOpt) error {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / PurgeDeletes", humanized))
 	defer span.End()
 
 	var err error
@@ -236,8 +236,8 @@ func (kv *keyvalue) PurgeDeletes(ctx context.Context, opts ...nats.PurgeOpt) err
 		}
 	}()
 
-	err = kv.store.PurgeDeletes(opts...)
-	setKeyValueAttributes(span, "", &nats.KeyValueConfig{
+	err = kv.store.PurgeDeletes(ctx, opts...)
+	setKeyValueAttributes(span, "", jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -248,15 +248,15 @@ func (kv *keyvalue) PurgeDeletes(ctx context.Context, opts ...nats.PurgeOpt) err
 Watch for any updates to keys that match the keys argument which could include
 wildcards. Watch will send a nil entry when it has received all initial values.
 */
-func (kv *keyvalue) Watch(ctx context.Context, keys string, opts ...nats.WatchOpt) (nats.KeyWatcher, error) {
-	return kv.store.Watch(keys, opts...)
+func (kv *keyvalue) Watch(ctx context.Context, keys string, opts ...jetstream.WatchOpt) (jetstream.KeyWatcher, error) {
+	return kv.store.Watch(ctx, keys, opts...)
 }
 
 /*
 WatchAll will invoke the callback for all updates.
 */
-func (kv *keyvalue) WatchAll(ctx context.Context, opts ...nats.WatchOpt) (nats.KeyWatcher, error) {
-	return kv.store.WatchAll(opts...)
+func (kv *keyvalue) WatchAll(ctx context.Context, opts ...jetstream.WatchOpt) (jetstream.KeyWatcher, error) {
+	return kv.store.WatchAll(ctx, opts...)
 }
 
 /*
@@ -264,8 +264,8 @@ Keys will return all keys.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) Keys(ctx context.Context, opts ...nats.WatchOpt) ([]string, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Keys", humanized))
+func (kv *keyvalue) Keys(ctx context.Context, opts ...jetstream.WatchOpt) ([]string, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Keys", humanized))
 	defer span.End()
 
 	var err error
@@ -275,8 +275,8 @@ func (kv *keyvalue) Keys(ctx context.Context, opts ...nats.WatchOpt) ([]string, 
 		}
 	}()
 
-	keys, err := kv.store.Keys(opts...)
-	setKeyValueAttributes(span, "", &nats.KeyValueConfig{
+	keys, err := kv.store.Keys(ctx, opts...)
+	setKeyValueAttributes(span, "", jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -288,8 +288,8 @@ History will return all historical values for the key.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) History(ctx context.Context, key string, opts ...nats.WatchOpt) ([]nats.KeyValueEntry, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / History", humanized))
+func (kv *keyvalue) History(ctx context.Context, key string, opts ...jetstream.WatchOpt) ([]jetstream.KeyValueEntry, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / History", humanized))
 	defer span.End()
 
 	var err error
@@ -299,8 +299,8 @@ func (kv *keyvalue) History(ctx context.Context, key string, opts ...nats.WatchO
 		}
 	}()
 
-	entries, err := kv.store.History(key, opts...)
-	setKeyValueAttributes(span, key, &nats.KeyValueConfig{
+	entries, err := kv.store.History(ctx, key, opts...)
+	setKeyValueAttributes(span, key, jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 
@@ -312,8 +312,8 @@ Status retrieves the status and configuration of a bucket.
 
 It automatically handles tracing and error recording.
 */
-func (kv *keyvalue) Status(ctx context.Context) (nats.KeyValueStatus, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Status", humanized))
+func (kv *keyvalue) Status(ctx context.Context) (jetstream.KeyValueStatus, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Key-Value / Status", humanized))
 	defer span.End()
 
 	var err error
@@ -323,8 +323,8 @@ func (kv *keyvalue) Status(ctx context.Context) (nats.KeyValueStatus, error) {
 		}
 	}()
 
-	status, err := kv.store.Status()
-	setKeyValueAttributes(span, "", &nats.KeyValueConfig{
+	status, err := kv.store.Status(ctx)
+	setKeyValueAttributes(span, "", jetstream.KeyValueConfig{
 		Bucket: kv.bucket,
 	})
 

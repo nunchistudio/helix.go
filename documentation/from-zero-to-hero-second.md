@@ -24,7 +24,7 @@ import (
   "go.nunchi.studio/helix/service"
   "go.nunchi.studio/helix/telemetry/trace"
 
-  "github.com/nats-io/nats.go"
+  "github.com/nats-io/nats.go/jetstream"
 )
 
 /*
@@ -56,25 +56,30 @@ func NewAndStart() error {
   app = &App{
     JetStream: js,
   }
-
+  
   // Create a new stream in NATS JetStream called "demo-stream", for subject "demo".
-  js.AddStream(context.Background(), &nats.StreamConfig{
+  stream, _ := js.CreateStream(context.Background(), jetstream.StreamConfig{
     Name:     "demo-stream",
     Subjects: []string{"demo"},
+  })
+
+  // Create a new NATS JetStream consumer called "demo-queue".
+  consumer, _ := stream.CreateOrUpdateConsumer(context.Background(), jetstream.ConsumerConfig{
+    Name: "demo-queue",
   })
 
   // Create a new, empty context.
   ctx := context.Background()
 
-  // Start subscribing to the queue "demo-queue" on subject "demo". We pass the
-  // empty context previously created. The context in the callback function is
-  // a copy of one the passed, but now contains the Event object at the origin
-  // of the trace (if any). You can also create your own span, which will be a
-  // child span of the trace found in the context (if any). In our case, the
-  // context includes Event created during the HTTP request, as well as the trace
-  // handled by the REST router. At any point in time, you can record an error
-  // in the span, which will be reported back to the root span.
-  js.QueueSubscribe(ctx, "demo", "demo-queue", func(ctx context.Context, msg *nats.Msg) {
+  // Start consuming messages from the queue "demo-queue" on subject "demo". We
+  // pass the empty context previously created. The context in the callback
+  // function is a copy of one the passed, but now contains the Event object at
+  // the origin of the trace (if any). You can also create your own span, which
+  // will be a child span of the trace found in the context (if any). In our case,
+  // the context includes Event created during the HTTP request, as well as the
+  // trace handled by the REST router. At any point in time, you can record an
+  // error in the span, which will be reported back to the root span.
+  consumer.Consume(ctx, func(ctx context.Context, msg jetstream.Msg) {
     _, span := trace.Start(ctx, trace.SpanKindConsumer, "Custom Span")
     defer span.End()
 

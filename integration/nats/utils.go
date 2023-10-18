@@ -10,6 +10,7 @@ import (
 	"go.nunchi.studio/helix/telemetry/trace"
 
 	"github.com/nats-io/nats.go"
+	"github.com/nats-io/nats.go/jetstream"
 )
 
 /*
@@ -24,39 +25,46 @@ func setMsgAttributes(span *trace.Span, msg *nats.Msg) {
 }
 
 /*
+setJetStreamMsgAttributes sets NATS JetStream message attributes to a trace span.
+*/
+func setJetStreamMsgAttributes(span *trace.Span, msg jetstream.Msg) {
+	span.SetStringAttribute(fmt.Sprintf("%s.message.subject", identifier), msg.Subject())
+}
+
+/*
 setConsumerAttributes sets NATS consumer attributes to a trace span.
 */
-func setConsumerAttributes(span *trace.Span, stream string, cfg *nats.ConsumerConfig) {
-	span.SetStringAttribute(fmt.Sprintf("%s.jetstream.stream.name", identifier), stream)
+func setConsumerAttributes(span *trace.Span, cfg jetstream.ConsumerConfig) {
+	span.SetStringAttribute(fmt.Sprintf("%s.jetstream.consumer.name", identifier), cfg.Name)
+	span.SetBoolAttribute(fmt.Sprintf("%s.jetstream.consumer.ordered", identifier), false)
+	span.SetSliceStringAttribute(fmt.Sprintf("%s.jetstream.consumer.subjects", identifier), cfg.FilterSubjects)
+}
 
-	if cfg != nil {
-		span.SetStringAttribute(fmt.Sprintf("%s.consumer.name", identifier), cfg.Name)
-		span.SetStringAttribute(fmt.Sprintf("%s.consumer.group", identifier), cfg.DeliverGroup)
-		span.SetStringAttribute(fmt.Sprintf("%s.consumer.subject", identifier), cfg.DeliverSubject)
-	}
+/*
+setOrderedConsumerAttributes sets NATS ordered consumer attributes to a trace span.
+*/
+func setOrderedConsumerAttributes(span *trace.Span, cfg jetstream.OrderedConsumerConfig) {
+	span.SetBoolAttribute(fmt.Sprintf("%s.jetstream.consumer.ordered", identifier), true)
+	span.SetSliceStringAttribute(fmt.Sprintf("%s.jetstream.consumer.subjects", identifier), cfg.FilterSubjects)
 }
 
 /*
 setStreamAttributes sets NATS stream attributes to a trace span.
 */
-func setStreamAttributes(span *trace.Span, cfg *nats.StreamConfig) {
-	if cfg != nil {
-		span.SetStringAttribute(fmt.Sprintf("%s.jetstream.stream.name", identifier), cfg.Name)
-		span.SetSliceStringAttribute(fmt.Sprintf("%s.jetstream.stream.subjects", identifier), cfg.Subjects)
-	}
+func setStreamAttributes(span *trace.Span, cfg jetstream.StreamConfig) {
+	span.SetStringAttribute(fmt.Sprintf("%s.jetstream.stream.name", identifier), cfg.Name)
+	span.SetSliceStringAttribute(fmt.Sprintf("%s.jetstream.stream.subjects", identifier), cfg.Subjects)
 }
 
 /*
 setKeyValueAttributes sets NATS Key-Value attributes to a trace span.
 */
-func setKeyValueAttributes(span *trace.Span, key string, cfg *nats.KeyValueConfig) {
+func setKeyValueAttributes(span *trace.Span, key string, cfg jetstream.KeyValueConfig) {
 	if key != "" {
 		span.SetStringAttribute(fmt.Sprintf("%s.jetstream.kv.key", identifier), key)
 	}
 
-	if cfg != nil {
-		span.SetStringAttribute(fmt.Sprintf("%s.jetstream.kv.bucket.name", identifier), cfg.Bucket)
-	}
+	span.SetStringAttribute(fmt.Sprintf("%s.jetstream.kv.bucket.name", identifier), cfg.Bucket)
 }
 
 /*
