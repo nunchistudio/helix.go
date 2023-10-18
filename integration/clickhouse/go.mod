@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.14.3
 	github.com/stretchr/testify v1.8.4
-	go.nunchi.studio/helix v0.14.1
+	go.nunchi.studio/helix v0.15.0
 )
 
 require (
@@ -45,5 +45,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../
