@@ -30,6 +30,7 @@ fit this ecosystem:
     https://www.elastic.co/guide/en/ecs/current/ecs-field-reference.html
 */
 type Event struct {
+	ID            string            `json:"id,omitempty"`
 	Name          string            `json:"name,omitempty"`
 	Meta          map[string]string `json:"meta,omitempty"`
 	Params        url.Values        `json:"params,omitempty"`
@@ -66,6 +67,7 @@ func injectEventToFlatMap(e Event, flatten map[string]string) {
 		flatten = make(map[string]string)
 	}
 
+	flatten["event.id"] = e.ID
 	flatten["event.name"] = e.Name
 
 	if e.Meta != nil {
@@ -124,6 +126,7 @@ clarity and maintainability.
 func extractEventFromBaggage(b baggage.Baggage) Event {
 	var e Event
 
+	e.ID = b.Member("event.id").Value()
 	e.Name = b.Member("event.name").Value()
 
 	for _, m := range b.Members() {
