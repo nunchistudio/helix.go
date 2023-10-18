@@ -14,6 +14,7 @@ has been triggered. It's useful for tracking customer usages.
 */
 type Subscription struct {
 	ID          string            `json:"id,omitempty"`
+	TenantID    string            `json:"tenant_id,omitempty"`
 	CustomerID  string            `json:"customer_id,omitempty"`
 	PlanID      string            `json:"plan_id,omitempty"`
 	Usage       string            `json:"usage,omitempty"`
@@ -33,6 +34,10 @@ func injectEventSubscriptionsToFlatMap(subs []Subscription, flatten map[string]s
 	for i, sub := range subs {
 		if sub.ID != "" {
 			flatten[fmt.Sprintf("event.subscriptions[%d].id", i)] = sub.ID
+		}
+
+		if sub.TenantID != "" {
+			flatten[fmt.Sprintf("event.subscriptions[%d].tenant_id", i)] = sub.TenantID
 		}
 
 		if sub.CustomerID != "" {
@@ -79,6 +84,8 @@ func applyEventSubscriptionsFromBaggageMember(m baggage.Member, e *Event) {
 	switch split[3] {
 	case "id":
 		e.Subscriptions[i].ID = m.Value()
+	case "tenant_id":
+		e.Subscriptions[i].TenantID = m.Value()
 	case "customer_id":
 		e.Subscriptions[i].CustomerID = m.Value()
 	case "plan_id":
