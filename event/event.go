@@ -126,9 +126,6 @@ clarity and maintainability.
 func extractEventFromBaggage(b baggage.Baggage) Event {
 	var e Event
 
-	e.ID = b.Member("event.id").Value()
-	e.Name = b.Member("event.name").Value()
-
 	for _, m := range b.Members() {
 		if !strings.HasPrefix(m.Key(), "event.") {
 			continue
@@ -157,6 +154,10 @@ func extractEventFromBaggage(b baggage.Baggage) Event {
 
 		split := strings.Split(m.Key(), ".")
 		switch split[1] {
+		case "id":
+			e.ID = b.Member("event.id").Value()
+		case "name":
+			e.Name = b.Member("event.name").Value()
 		case "is_anonymous":
 			e.IsAnonymous, _ = strconv.ParseBool(b.Member("event.is_anonymous").Value())
 		case "user_id":
