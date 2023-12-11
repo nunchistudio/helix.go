@@ -3,6 +3,8 @@ package temporal
 import (
 	"go.nunchi.studio/helix/errorstack"
 	"go.nunchi.studio/helix/integration"
+
+	"go.temporal.io/sdk/converter"
 )
 
 /*
@@ -23,6 +25,10 @@ type Config struct {
 	//
 	//   "default"
 	Namespace string `json:"namespace"`
+
+	// DataConverter customizes serialization/deserialization of arguments in
+	// Temporal.
+	DataConverter converter.DataConverter `json:"-"`
 
 	// Worker configures a Temporal worker if the helix service should run as worker
 	// for Temporal.
@@ -48,6 +54,34 @@ type ConfigWorker struct {
 	//
 	// Required when enabled.
 	TaskQueue string `json:"taskqueue,omitempty"`
+
+	// WorkerActivitiesPerSecond sets the rate limiting on number of activities that
+	// can be executed per second per worker. This can be used to limit resources
+	// used by the worker.
+	//
+	// Notice that the number is represented in float, so that you can set it to
+	// less than 1 if needed. For example, set the number to 0.1 means you want
+	// your activity to be executed once for every 10 seconds. This can be used to
+	// protect down stream services from flooding.
+	//
+	// Default:
+	//
+	//   100 000
+	WorkerActivitiesPerSecond float64 `json:"worker_activities_per_second,omitempty"`
+
+	// TaskQueueActivitiesPerSecond sets the rate limiting on number of activities
+	// that can be executed per second. This is managed by the server and controls
+	// activities per second for your entire taskqueue.
+	//
+	// Notice that the number is represented in float, so that you can set it to
+	// less than 1 if needed. For example, set the number to 0.1 means you want
+	// your activity to be executed once for every 10 seconds. This can be used to
+	// protect down stream services from flooding.
+	//
+	// Default:
+	//
+	//   100 000
+	TaskQueueActivitiesPerSecond float64 `json:"taskqueue_activities_per_second,omitempty"`
 }
 
 /*

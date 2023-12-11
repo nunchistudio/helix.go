@@ -64,6 +64,7 @@ func Connect(cfg Config) (Client, Worker, error) {
 				Tracer: t,
 			}),
 		},
+		DataConverter: cfg.DataConverter,
 	}
 
 	// Set TLS options only if enabled in Config.
@@ -93,7 +94,9 @@ func Connect(cfg Config) (Client, Worker, error) {
 	// Create a Temporal worker if enabled in Config.
 	if cfg.Worker.Enabled {
 		var optsWorker = worker.Options{
-			EnableSessionWorker: true,
+			WorkerActivitiesPerSecond:    cfg.Worker.WorkerActivitiesPerSecond,
+			TaskQueueActivitiesPerSecond: cfg.Worker.TaskQueueActivitiesPerSecond,
+			EnableSessionWorker:          true,
 		}
 
 		conn.worker = worker.New(conn.client, cfg.Worker.TaskQueue, optsWorker)
