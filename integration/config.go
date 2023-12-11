@@ -20,7 +20,14 @@ type ConfigTLS struct {
 	// ServerName is used to verify the hostname on the returned certificates. It
 	// is also included in the client's handshake to support virtual hosting unless
 	// it is an IP address.
-	ServerName string `json:"-"`
+	ServerName string `json:"server_name,omitempty"`
+
+	// InsecureSkipVerify controls whether a client verifies the server's certificate
+	// chain and host name. If InsecureSkipVerify is true, crypto/tls accepts any
+	// certificate presented by the server and any host name in that certificate.
+	// In this mode, TLS is susceptible to machine-in-the-middle attacks unless
+	// custom verification is used.
+	InsecureSkipVerify bool `json:"insecure_skip_verify"`
 
 	// CertFile is the relative or absolute path to the certificate file.
 	//
@@ -115,8 +122,8 @@ func (cfg *ConfigTLS) ToStandardTLS() (*tls.Config, []errorstack.Validation) {
 	}
 
 	tlsConfig := &tls.Config{
-		InsecureSkipVerify: false,
 		ServerName:         cfg.ServerName,
+		InsecureSkipVerify: cfg.InsecureSkipVerify,
 		Certificates:       []tls.Certificate{cert},
 		RootCAs:            caCertPool,
 	}
