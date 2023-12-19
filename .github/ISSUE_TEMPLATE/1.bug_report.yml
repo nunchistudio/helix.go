@@ -43,6 +43,7 @@ body:
       options:
         - clickhouse
         - nats
+        - openfeature
         - postgres
         - rest
         - temporal

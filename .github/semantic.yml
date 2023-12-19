@@ -16,6 +16,7 @@ scopes:
   - "errorstack"
   - "logger"
   - "nats"
+  - "openfeature"
   - "postgres"
   - "rest"
   - "service"
