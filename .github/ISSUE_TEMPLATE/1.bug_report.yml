@@ -41,6 +41,7 @@ body:
       description: Select none if this applies to the core or the entire ecosystem.
       multiple: true
       options:
+        - bucket
         - clickhouse
         - nats
         - openfeature
