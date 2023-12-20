@@ -62,8 +62,8 @@ func init() {
 	}
 
 	// Set the OpenTelemetry traces' endpoint only if specified.
-	if os.Getenv("OTEL_TRACES_ENDPOINT") != "" {
-		opts = append(opts, otlptracegrpc.WithEndpoint(os.Getenv("OTEL_TRACES_ENDPOINT")))
+	if os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT") != "" {
+		opts = append(opts, otlptracegrpc.WithEndpoint(os.Getenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")))
 	}
 
 	// Create the trace exporter.
