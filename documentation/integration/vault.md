@@ -10,6 +10,7 @@ Simple example on how to import, configure, and use the integration:
 ```go
 import (
   "context"
+  "fmt"
 
   "go.nunchi.studio/helix/integration/vault"
   "go.nunchi.studio/helix/service"
@@ -34,7 +35,7 @@ func main() {
     // ...
   }
 
-  fmt.Println("Secret:", secret.data)
+  fmt.Println("Secret:", secret.Data)
 
   if err := service.Start(); err != nil {
     panic(err)
