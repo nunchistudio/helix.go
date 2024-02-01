@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/hashicorp/vault/api v1.11.0
 	github.com/stretchr/testify v1.8.4
-	go.nunchi.studio/helix v0.16.0
+	go.nunchi.studio/helix v0.16.1
 )
 
 require (
@@ -54,5 +54,3 @@ require (
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../
