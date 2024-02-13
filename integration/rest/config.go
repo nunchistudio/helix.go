@@ -27,7 +27,7 @@ type Config struct {
 	//
 	//   GET /health
 	//
-	// It should return 200 if service is healthy, or 5xx if an error occured.
+	// It should return 200 if service is healthy, or 5xx if an error occurred.
 	// Returns 200 by default.
 	Healthcheck func(req *http.Request) int `json:"-"`
 

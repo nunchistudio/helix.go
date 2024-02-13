@@ -51,9 +51,9 @@ func EventFromJSON(input json.RawMessage) (Event, bool) {
 
 /*
 ToFlatMap returns a flatten map for a given Event. Keys are prefixed with "event.",
-and struct level are seperated by a ".". All values are stringified.
+and struct level are separated by a ".". All values are stringified.
 
-This is primarly designed for the telemetry packages, allowing to pass contextual
+This is primarily designed for the telemetry packages, allowing to pass contextual
 information about an event using Go's context or HTTP headers, but can be useful
 in some other use cases.
 

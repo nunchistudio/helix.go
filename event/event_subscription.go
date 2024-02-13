@@ -73,7 +73,7 @@ func applyEventSubscriptionsFromBaggageMember(m baggage.Member, e *Event) {
 	split := strings.Split(m.Key(), ".")
 
 	// Make sure to append a new subscription if the index found is greater than
-	// the current lenght of the Subscriptions slice. Since the Baggage members
+	// the current length of the Subscriptions slice. Since the Baggage members
 	// are not ordered, a key with index 1 may be called before one with index 0,
 	// such as "event.subscriptions[1].id" called before "event.subscriptions[0].id".
 	i, _ := strconv.Atoi(split[2])

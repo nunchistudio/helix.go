@@ -37,7 +37,7 @@ func (conn *connection) Close(ctx context.Context) error {
 /*
 Status indicates if the integration is able to connect to the Vault server or not.
 Returns `200` if connection is working, `503` if Vault is sealed, is not
-initialized, or if an error occured.
+initialized, or if an error occurred.
 */
 func (conn *connection) Status(ctx context.Context) (int, error) {
 	stack := errorstack.New("Integration is not in a healthy state", errorstack.WithIntegration(identifier))

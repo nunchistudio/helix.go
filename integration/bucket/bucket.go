@@ -117,7 +117,7 @@ func (conn *connection) Read(ctx context.Context, key string) ([]byte, error) {
 }
 
 /*
-Write writes bytes represenation of blob at key, with some optional options.
+Write writes bytes representation of blob at key, with some optional options.
 
 It automatically handles tracing and error recording.
 */

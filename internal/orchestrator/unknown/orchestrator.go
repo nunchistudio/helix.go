@@ -34,7 +34,7 @@ func init() {
 
 /*
 build populates the orchestrator as a fallback orchestrator. If no orchestrator
-is returned it means an internal error occured while finding the path to the
+is returned it means an internal error occurred while finding the path to the
 Go executable currently being run, fallbacks to a static string if necessary.
 This should never happen.
 */
