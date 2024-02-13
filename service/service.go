@@ -48,11 +48,10 @@ Start initializes the helix service, and starts each integration attached by
 executing their Start function. This returns as soon as an interrupting signal
 is catched or when an integration returns an error while starting it.
 */
-func Start() error {
+func Start(ctx context.Context) error {
 	svc.mutex.Lock()
 	defer svc.mutex.Unlock()
 
-	ctx := context.Background()
 	stack := errorstack.New("Failed to initialize the service")
 	if svc.isInitialized {
 		stack.WithValidations(errorstack.Validation{
@@ -110,11 +109,10 @@ func Start() error {
 Close tries to gracefully close connections with all integrations. It then tries
 to drain/close the tracer and logger.
 */
-func Close() error {
+func Close(ctx context.Context) error {
 	svc.mutex.Lock()
 	defer svc.mutex.Unlock()
 
-	ctx := context.Background()
 	stack := errorstack.New("Failed to gracefully close service's connections")
 	if !svc.isInitialized {
 		stack.WithValidations(errorstack.Validation{
