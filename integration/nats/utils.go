@@ -16,7 +16,7 @@ import (
 /*
 setMsgAttributes sets NATS message attributes to a trace span.
 */
-func setMsgAttributes(span *trace.Span, msg *nats.Msg) {
+func setMsgAttributes(span *trace.Span, msg *Msg) {
 	if msg != nil {
 		span.SetStringAttribute(fmt.Sprintf("%s.message.subject", identifier), msg.Subject)
 		span.SetStringAttribute(fmt.Sprintf("%s.subscription.subject", identifier), msg.Sub.Subject)

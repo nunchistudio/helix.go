@@ -11,10 +11,8 @@ Simple example on how to import, configure, and use the integration:
 import (
   "context"
 
-  natsinte "go.nunchi.studio/helix/integration/nats"
+  "go.nunchi.studio/helix/integration/nats"
   "go.nunchi.studio/helix/service"
-
-  "github.com/nats-io/nats.go"
 )
 
 func main() {

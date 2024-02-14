@@ -13,17 +13,34 @@ import (
 )
 
 /*
+Msg is an alias to nats.Msg. This avoids to import the nats package and therefore
+avoids naming conflict as much as possible.
+*/
+type Msg = nats.Msg
+
+/*
+Subscription is an alias to nats.Subscription. This avoids to import the nats
+package and therefore avoids naming conflict as much as possible.
+*/
+type Subscription = nats.Subscription
+
+/*
+Header is an alias to nats.Header. This avoids to import the nats package and
+therefore avoids naming conflict as much as possible.
+*/
+type Header = nats.Header
+
+/*
 JetStream exposes an opinionated way to interact with NATS JetStream.
 */
 type JetStream interface {
-	Publish(ctx context.Context, msg *nats.Msg, opts ...jetstream.PublishOpt) (*jetstream.PubAck, error)
-	PublishAsync(ctx context.Context, msg *nats.Msg, opts ...jetstream.PublishOpt) (jetstream.PubAckFuture, error)
+	Publish(ctx context.Context, msg *Msg, opts ...jetstream.PublishOpt) (*jetstream.PubAck, error)
+	PublishAsync(ctx context.Context, msg *Msg, opts ...jetstream.PublishOpt) (jetstream.PubAckFuture, error)
 	PublishAsyncPending(ctx context.Context) int
 	PublishAsyncComplete(ctx context.Context) <-chan struct{}
 
 	Stream(ctx context.Context, streamname string) (Stream, error)
-	CreateStream(ctx context.Context, config jetstream.StreamConfig) (Stream, error)
-	UpdateStream(ctx context.Context, config jetstream.StreamConfig) (Stream, error)
+	CreateOrUpdateStream(ctx context.Context, config jetstream.StreamConfig) (Stream, error)
 	DeleteStream(ctx context.Context, streamname string) error
 
 	Consumer(ctx context.Context, streamname string, consumername string) (Consumer, error)
@@ -32,7 +49,7 @@ type JetStream interface {
 	DeleteConsumer(ctx context.Context, streamname string, consumername string) error
 
 	KeyValue(ctx context.Context, bucket string) (KeyValue, error)
-	CreateKeyValue(ctx context.Context, config jetstream.KeyValueConfig) (KeyValue, error)
+	CreateOrUpdateKeyValue(ctx context.Context, config jetstream.KeyValueConfig) (KeyValue, error)
 	DeleteKeyValue(ctx context.Context, bucket string) error
 }
 
@@ -41,7 +58,7 @@ Publish publishes a message to NATS JetStream.
 
 It automatically handles tracing and error recording.
 */
-func (conn *connection) Publish(ctx context.Context, msg *nats.Msg, opts ...jetstream.PublishOpt) (*jetstream.PubAck, error) {
+func (conn *connection) Publish(ctx context.Context, msg *Msg, opts ...jetstream.PublishOpt) (*jetstream.PubAck, error) {
 	ctx, span := trace.Start(ctx, trace.SpanKindProducer, fmt.Sprintf("%s: Publish", humanized))
 	if msg.Header == nil {
 		msg.Header = make(nats.Header)
@@ -69,7 +86,7 @@ The message should not be changed until the PubAckFuture has been processed.
 
 It automatically handles tracing and error recording.
 */
-func (conn *connection) PublishAsync(ctx context.Context, msg *nats.Msg, opts ...jetstream.PublishOpt) (jetstream.PubAckFuture, error) {
+func (conn *connection) PublishAsync(ctx context.Context, msg *Msg, opts ...jetstream.PublishOpt) (jetstream.PubAckFuture, error) {
 	ctx, span := trace.Start(ctx, trace.SpanKindProducer, fmt.Sprintf("%s: PublishAsync", humanized))
 	if msg.Header == nil {
 		msg.Header = make(nats.Header)
@@ -140,23 +157,23 @@ func (conn *connection) Stream(ctx context.Context, streamname string) (Stream, 
 }
 
 /*
-CreateStream creates a new stream with given config and returns a hook to operate
-on it.
+CreateOrUpdateStream creates a new stream with given config and returns a hook
+to operate on it. If stream already exists, it will be updated (if possible).
 
 It automatically handles tracing and error recording.
 */
-func (conn *connection) CreateStream(ctx context.Context, config jetstream.StreamConfig) (Stream, error) {
-	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: CreateStream", humanized))
+func (conn *connection) CreateOrUpdateStream(ctx context.Context, config jetstream.StreamConfig) (Stream, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: CreateOrUpdateStream", humanized))
 	defer span.End()
 
 	var err error
 	defer func() {
 		if err != nil {
-			span.RecordError("failed to create stream", err)
+			span.RecordError("failed to create or update stream", err)
 		}
 	}()
 
-	created, err := conn.jetstream.CreateStream(ctx, config)
+	created, err := conn.jetstream.CreateOrUpdateStream(ctx, config)
 	setStreamAttributes(span, config)
 	if err != nil {
 		return nil, err
@@ -165,37 +182,6 @@ func (conn *connection) CreateStream(ctx context.Context, config jetstream.Strea
 	stream := &stream{
 		config: config,
 		client: created,
-	}
-
-	return stream, nil
-}
-
-/*
-UpdateStream updates an existing stream with given config and returns a hook to
-operate on it.
-
-It automatically handles tracing and error recording.
-*/
-func (conn *connection) UpdateStream(ctx context.Context, config jetstream.StreamConfig) (Stream, error) {
-	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: UpdateStream", humanized))
-	defer span.End()
-
-	var err error
-	defer func() {
-		if err != nil {
-			span.RecordError("failed to update stream", err)
-		}
-	}()
-
-	updated, err := conn.jetstream.UpdateStream(ctx, config)
-	setStreamAttributes(span, config)
-	if err != nil {
-		return nil, err
-	}
-
-	stream := &stream{
-		config: config,
-		client: updated,
 	}
 
 	return stream, nil
@@ -376,22 +362,23 @@ func (conn *connection) KeyValue(ctx context.Context, bucket string) (KeyValue, 
 }
 
 /*
-CreateKeyValue creates a key-value store.
+CreateOrUpdateKeyValue creates a key-value store if it does not exist or update
+an existing KeyValue store with the given configuration (if possible).
 
 It automatically handles tracing and error recording.
 */
-func (conn *connection) CreateKeyValue(ctx context.Context, config jetstream.KeyValueConfig) (KeyValue, error) {
-	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: CreateKeyValue", humanized))
+func (conn *connection) CreateOrUpdateKeyValue(ctx context.Context, config jetstream.KeyValueConfig) (KeyValue, error) {
+	ctx, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: CreateOrUpdateKeyValue", humanized))
 	defer span.End()
 
 	var err error
 	defer func() {
 		if err != nil {
-			span.RecordError("failed to create key-value store", err)
+			span.RecordError("failed to create or update key-value store", err)
 		}
 	}()
 
-	store, err := conn.jetstream.CreateKeyValue(ctx, config)
+	store, err := conn.jetstream.CreateOrUpdateKeyValue(ctx, config)
 	setKeyValueAttributes(span, "", config)
 	if err != nil {
 		return nil, err
