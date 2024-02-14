@@ -49,9 +49,24 @@ func (rw *responseWriter) WriteHeader(status int) {
 Response is the JSON object every HTTP responses shall return.
 */
 type Response struct {
-	Status string            `json:"status"`
-	Error  *errorstack.Error `json:"error,omitempty"`
-	Data   any               `json:"data,omitempty"`
+
+	// Status is the official text of the HTTP status code, in English.
+	//
+	// Example:
+	//
+	//   "Accepted"
+	Status string `json:"status"`
+
+	// Error represents a stack of errors and error validations. Error will always
+	// be nil when returning a 2xx status using a response writer of this package.
+	Error *errorstack.Error `json:"error,omitempty"`
+
+	// Metadata represents metadata associated to the request/response.
+	Metadata any `json:"metadata,omitempty"`
+
+	// Data represents the data returned in the response. Data will always be nil
+	// when returning a 4xx or 5xx status using a response writer of this package.
+	Data any `json:"data,omitempty"`
 }
 
 /*
@@ -82,17 +97,7 @@ handlerNotFound is the default handler function if the path is not found (error
 404).
 */
 func (r *rest) handlerNotFound(rw http.ResponseWriter, req bunrouter.Request) error {
-	res := &Response{
-		Status: http.StatusText(http.StatusNotFound),
-		Error: &errorstack.Error{
-			Message: "Resource does not exist",
-		},
-	}
-
-	b, _ := json.Marshal(res)
-	rw.WriteHeader(http.StatusNotFound)
-	rw.Write(b)
-
+	WriteNotFound(rw, req.Request)
 	return nil
 }
 
@@ -101,16 +106,6 @@ handlerMethodNotAllowed is the default handler function if the method is not
 allowed (error 405).
 */
 func (r *rest) handlerMethodNotAllowed(rw http.ResponseWriter, req bunrouter.Request) error {
-	res := &Response{
-		Status: http.StatusText(http.StatusMethodNotAllowed),
-		Error: &errorstack.Error{
-			Message: "Resource does not support this method",
-		},
-	}
-
-	b, _ := json.Marshal(res)
-	rw.WriteHeader(http.StatusMethodNotAllowed)
-	rw.Write(b)
-
+	WriteMethodNotAllowed(rw, req.Request)
 	return nil
 }

@@ -10,6 +10,8 @@ an `Event` from the messages' headers.
 ```go
 import (
   "go.nunchi.studio/helix/event"
+  "go.nunchi.studio/helix/integration/nats"
+  "go.nunchi.studio/helix/integration/rest"
 )
 
 router.POST("/anything", func(rw http.ResponseWriter, req *http.Request) {
@@ -37,6 +39,6 @@ router.POST("/anything", func(rw http.ResponseWriter, req *http.Request) {
 
   js.Publish(ctx, msg)
 
-  handlerfunc.Accepted(rw, req)
+  rest.WriteAccepted(rw, req)
 })
 ```

@@ -31,7 +31,6 @@ import (
   "net/http"
 
   "go.nunchi.studio/helix/integration/rest"
-  "go.nunchi.studio/helix/integration/rest/handlerfunc"
   "go.nunchi.studio/helix/service"
 )
 
@@ -67,7 +66,7 @@ func NewAndStart() error {
 
   // Add a simple route, returning a 202 HTTP response.
   router.POST("/anything", func(rw http.ResponseWriter, req *http.Request) {
-    handlerfunc.Accepted(rw, req)
+    rest.WriteAccepted(rw, req)
   })
 
   // Start the service using the helix's service package. Only one helix service

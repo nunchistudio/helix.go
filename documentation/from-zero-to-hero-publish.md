@@ -11,7 +11,6 @@ import (
   "go.nunchi.studio/helix/event"
   "go.nunchi.studio/helix/integration/nats"
   "go.nunchi.studio/helix/integration/rest"
-  "go.nunchi.studio/helix/integration/rest/handlerfunc"
   "go.nunchi.studio/helix/service"
 )
 
@@ -87,7 +86,7 @@ func NewAndStart() error {
 
     js.Publish(ctx, msg)
 
-    handlerfunc.Accepted(rw, req)
+    rest.WriteAccepted(rw, req)
   })
 
   // Start the service using the helix's service package. Only one helix service

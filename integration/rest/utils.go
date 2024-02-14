@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -16,6 +17,20 @@ import (
 	"github.com/uptrace/bunrouter/extra/bunrouterotel"
 	"github.com/uptrace/bunrouter/extra/reqlog"
 )
+
+/*
+writeResponse is a small utility used by all HTTP response writer functions of
+this package to easily write response's status code and body.
+*/
+func writeResponse(status int, rw http.ResponseWriter, res *Response, opts ...With) {
+	for _, opt := range opts {
+		opt(res)
+	}
+
+	b, _ := json.Marshal(res)
+	rw.WriteHeader(status)
+	rw.Write(b)
+}
 
 /*
 buildRouter tries to build the HTTP router. It comes with opinionated handlers
@@ -107,7 +122,7 @@ so we can more easily format them in the response returned to the client.
 
 Example:
 
-	{
+	map[string][]string{
 	  "request.headers.X-API-KEY": ["security requirements must be set"]
 	  "request.body.event.name": ["property "name" is missing"]
 	}

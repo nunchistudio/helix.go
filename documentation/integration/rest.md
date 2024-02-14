@@ -9,7 +9,6 @@ import (
   "net/http"
 
   "go.nunchi.studio/helix/integration/rest"
-  "go.nunchi.studio/helix/integration/rest/handlerfunc"
   "go.nunchi.studio/helix/service"
 )
 
@@ -30,7 +29,7 @@ func main() {
   router.POST("/users/:id", func(rw http.ResponseWriter, req *http.Request) {
     params, ok := rest.ParamsFromContext(req.Context())
     if !ok {
-      handlerfunc.NotFound(rw, req)
+      rest.WriteNotFound(rw, req)
       return
     }
 
@@ -38,7 +37,7 @@ func main() {
     
     // ...
     
-    handlerfunc.Accepted(rw, req)
+    rest.WriteAccepted(rw, req)
   })
 
   if err := service.Start(); err != nil {
