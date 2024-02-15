@@ -1,6 +1,6 @@
 module go.nunchi.studio/helix/integration/rest
 
-go 1.21
+go 1.22
 
 require (
 	github.com/getkin/kin-openapi v0.123.0
@@ -11,6 +11,11 @@ require (
 	go.nunchi.studio/helix v0.16.1
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.48.0
 	golang.org/x/text v0.14.0
+)
+
+retract (
+	[v0.16.0, v0.16.1] // No longer supported: Go 1.22+ required.
+	[v0.11.0, v0.15.0] // No longer supported: license not open source.
 )
 
 require (

@@ -1,6 +1,6 @@
 module go.nunchi.studio/helix/integration/temporal
 
-go 1.21
+go 1.22
 
 require (
 	github.com/stretchr/testify v1.8.4
@@ -10,6 +10,11 @@ require (
 	go.temporal.io/api v1.27.0
 	go.temporal.io/sdk v1.26.0-rc.2
 	go.temporal.io/sdk/contrib/opentelemetry v0.4.0
+)
+
+retract (
+	[v0.16.0, v0.16.1] // No longer supported: Go 1.22+ required.
+	[v0.11.0, v0.15.0] // No longer supported: license not open source.
 )
 
 require (

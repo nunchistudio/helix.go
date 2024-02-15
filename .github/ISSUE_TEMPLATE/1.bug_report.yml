@@ -32,7 +32,7 @@ body:
     attributes:
       label: What Go version are you running?
       options:
-        - 1.21.x
+        - 1.22.x
     validations:
       required: true
   - type: dropdown

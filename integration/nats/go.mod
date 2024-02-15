@@ -1,12 +1,17 @@
 module go.nunchi.studio/helix/integration/nats
 
-go 1.21
+go 1.22
 
 require (
 	github.com/nats-io/nats.go v1.33.0
 	github.com/stretchr/testify v1.8.4
 	go.nunchi.studio/helix v0.16.1
 	go.opentelemetry.io/otel v1.23.1
+)
+
+retract (
+	[v0.16.0, v0.16.1] // No longer supported: Go 1.22+ required.
+	[v0.11.0, v0.15.0] // No longer supported: license not open source.
 )
 
 require (

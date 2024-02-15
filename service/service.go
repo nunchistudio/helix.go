@@ -84,8 +84,6 @@ func Start(ctx context.Context) error {
 	// For each integration attached, execute its Start function. If an error is
 	// encountered, send the error as a child error to the channel.
 	for _, inte := range svc.integrations {
-		inte := inte
-
 		go func() {
 			err := inte.Start(ctx)
 			if err != nil {
@@ -134,7 +132,6 @@ func Close(ctx context.Context) error {
 	for _, inte := range svc.integrations {
 		wg.Add(1)
 
-		inte := inte
 		go func() {
 			defer wg.Done()
 

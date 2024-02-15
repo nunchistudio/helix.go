@@ -73,7 +73,6 @@ func Status(ctx context.Context) (int, error) {
 	// checks asynchronously. Write the status returned to the channel.
 	var wg sync.WaitGroup
 	for _, inte := range svc.integrations {
-		inte := inte
 		wg.Add(1)
 
 		go func() {
