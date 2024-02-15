@@ -8,7 +8,7 @@ body:
     attributes:
       label: What helix version are you using?
       options:
-        - 0.16.x
+        - 0.17.x
     validations:
       required: true
   - type: dropdown
