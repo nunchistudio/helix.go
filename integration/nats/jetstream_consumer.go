@@ -46,7 +46,7 @@ retrieved or request times out.
 It automatically handles tracing and error recording.
 */
 func (c *consumer) Fetch(ctx context.Context, batch int, opts ...jetstream.FetchOpt) (jetstream.MessageBatch, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Consumer / Fetch", humanized))
+	_, span := trace.Start(ctx, trace.SpanKindConsumer, fmt.Sprintf("%s: Consumer / Fetch", humanized))
 	defer span.End()
 
 	var err error
@@ -70,7 +70,7 @@ exceeded or request times out.
 It automatically handles tracing and error recording.
 */
 func (c *consumer) FetchBytes(ctx context.Context, maxBytes int, opts ...jetstream.FetchOpt) (jetstream.MessageBatch, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Consumer / FetchBytes", humanized))
+	_, span := trace.Start(ctx, trace.SpanKindConsumer, fmt.Sprintf("%s: Consumer / FetchBytes", humanized))
 	defer span.End()
 
 	var err error
@@ -94,7 +94,7 @@ provided number of messages.
 It automatically handles tracing and error recording.
 */
 func (c *consumer) FetchNoWait(ctx context.Context, batch int) (jetstream.MessageBatch, error) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Consumer / FetchNoWait", humanized))
+	_, span := trace.Start(ctx, trace.SpanKindConsumer, fmt.Sprintf("%s: Consumer / FetchNoWait", humanized))
 	defer span.End()
 
 	var err error

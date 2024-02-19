@@ -3,7 +3,7 @@ module go.nunchi.studio/helix/integration/nats
 go 1.22
 
 require (
-	github.com/nats-io/nats.go v1.33.0
+	github.com/nats-io/nats.go v1.33.1
 	github.com/stretchr/testify v1.8.4
 	go.nunchi.studio/helix v0.17.0
 	go.opentelemetry.io/otel v1.23.1

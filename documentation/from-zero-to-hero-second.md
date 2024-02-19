@@ -20,7 +20,7 @@ import (
   "context"
   "errors"
 
-  natsinte "go.nunchi.studio/helix/integration/nats"
+  "go.nunchi.studio/helix/integration/nats"
   "go.nunchi.studio/helix/service"
   "go.nunchi.studio/helix/telemetry/trace"
 
@@ -32,7 +32,7 @@ App holds the different components needed to run our Go service. In this
 case, it only holds a NATS JetStream context.
 */
 type App struct {
-  JetStream natsinte.JetStream
+  JetStream nats.JetStream
 }
 
 /*
@@ -47,7 +47,7 @@ func NewAndStart() error {
 
   // First, create a new NATS JetStream context. We keep empty config but feel
   // free to dive more later for advanced configuration.
-  js, err := natsinte.Connect(natsinte.Config{})
+  js, err := nats.Connect(nats.Config{})
   if err != nil {
     return err
   }
@@ -58,7 +58,7 @@ func NewAndStart() error {
   }
   
   // Create a new stream in NATS JetStream called "demo-stream", for subject "demo".
-  stream, _ := js.CreateStream(context.Background(), jetstream.StreamConfig{
+  stream, _ := js.CreateOrUpdateStream(context.Background(), jetstream.StreamConfig{
     Name:     "demo-stream",
     Subjects: []string{"demo"},
   })

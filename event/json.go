@@ -5,8 +5,7 @@ import (
 )
 
 /*
-Key is the key that shall be present in a JSON-encoded value representing
-an Event.
+Key is the key that shall be present in a JSON-encoded value representing an Event.
 
 Example:
 

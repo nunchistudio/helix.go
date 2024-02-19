@@ -11,9 +11,8 @@ var _ error = (*Error)(nil)
 
 /*
 Error implements the Go native error type and is designed for handling errors
-in the helix.go ecosystem. When exposing errors to clients (such as via HTTP
-API), the root error should not give away too much information such as internal
-messages.
+in the helix ecosystem. When exposing errors to clients (such as via HTTP API),
+the root error should not give away too much information such as internal messages.
 */
 type Error struct {
 
@@ -30,9 +29,9 @@ type Error struct {
 	// Message is the top-level message of the error.
 	Message string `json:"message"`
 
-	// Validations represents a list of failed configuration validations. This is
-	// used when a Integration's configuration encountered errors related to values
-	// set by clients.
+	// Validations represents a list of failure validations related to the error
+	// itself. This allows to pass/retrieve additional details, such as validation
+	// failures encountered in the request payload.
 	Validations []Validation `json:"validations,omitempty"`
 
 	// Children holds child errors encountered in cascade related to the current
@@ -53,7 +52,7 @@ type Validation struct {
 	//
 	// Example:
 	//
-	//   []string{"Options", "Producer", "MaxRetries"}
+	//   []string{"request", "body", "user", "email"}
 	Path []string `json:"path,omitempty"`
 }
 

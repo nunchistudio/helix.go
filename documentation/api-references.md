@@ -1,2 +1,0 @@
-- [Go API reference](https://pkg.go.dev/go.nunchi.studio/helix)
-- [helix.go on GitHub](https://github.com/nunchistudio/helix.go)

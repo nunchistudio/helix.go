@@ -51,7 +51,7 @@ Stop closes the iterator and cancels subscription.
 It automatically handles tracing.
 */
 func (mc *messagescontext) Stop(ctx context.Context) {
-	_, span := trace.Start(ctx, trace.SpanKindClient, fmt.Sprintf("%s: Consumer Iterator / Stop", humanized))
+	_, span := trace.Start(ctx, trace.SpanKindConsumer, fmt.Sprintf("%s: Consumer Iterator / Stop", humanized))
 	defer span.End()
 
 	mc.client.Stop()
