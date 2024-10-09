@@ -13,8 +13,8 @@ import (
 	"go.nunchi.studio/helix/service"
 
 	"github.com/go-logr/zapr"
-	gofeatureflag "github.com/open-feature/go-sdk-contrib/providers/go-feature-flag/pkg"
-	"github.com/open-feature/go-sdk/pkg/openfeature"
+	gofeatureflaginprocess "github.com/open-feature/go-sdk-contrib/providers/go-feature-flag-in-process/pkg"
+	"github.com/open-feature/go-sdk/openfeature"
 	ffclient "github.com/thomaspoignant/go-feature-flag"
 	"github.com/thomaspoignant/go-feature-flag/retriever"
 	"github.com/thomaspoignant/go-feature-flag/retriever/fileretriever"
@@ -77,7 +77,7 @@ func Init(cfg Config) (OpenFeature, error) {
 	}
 
 	// Set the OpenFeature options for the GO Feature Flag provider.
-	var opts = gofeatureflag.ProviderOptions{
+	var opts = gofeatureflaginprocess.ProviderOptions{
 		GOFeatureFlagConfig: &ffclient.Config{
 			Environment: os.Getenv("ENVIRONMENT"),
 			Retrievers:  retrievers,
@@ -85,7 +85,7 @@ func Init(cfg Config) (OpenFeature, error) {
 	}
 
 	// Try to create the OpenFeature provider.
-	provider, err := gofeatureflag.NewProvider(opts)
+	provider, err := gofeatureflaginprocess.NewProvider(opts)
 	if err != nil {
 		stack.WithValidations(errorstack.Validation{
 			Message: err.Error(),
@@ -95,7 +95,7 @@ func Init(cfg Config) (OpenFeature, error) {
 	}
 
 	// Set the default OpenFeature provider.
-	err = openfeature.SetProvider(provider)
+	err = openfeature.SetProviderAndWait(provider)
 	if err != nil {
 		stack.WithValidations(errorstack.Validation{
 			Message: err.Error(),
