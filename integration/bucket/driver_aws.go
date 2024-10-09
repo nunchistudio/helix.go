@@ -27,12 +27,12 @@ Config example:
 var DriverAWS Driver = &driverAWS{}
 
 /*
-driverAWS is the internal type to use AWS as bucket driver.
+driverAWS is the internal type to use AWS S3 as bucket driver.
 */
 type driverAWS struct{}
 
 /*
-string returns the string representation of the AWS bucket driver.
+string returns the string representation of the AWS S3 bucket driver.
 */
 func (d *driverAWS) string() string {
 	return "aws"
