@@ -41,7 +41,7 @@ func WithValidations(validations []errorstack.Validation) With {
 /*
 WithMetadata set the metadata object for the response.
 */
-func WithMetadata(metadata any) With {
+func WithMetadata[T any](metadata T) With {
 	return func(res *Response) {
 		if res != nil {
 			res.Metadata = metadata
@@ -54,7 +54,7 @@ WithData set the data object for the response.
 
 WithData has no effect on non-2xx HTTP responses.
 */
-func WithData(data any) With {
+func WithData[T any](data T) With {
 	return func(res *Response) {
 		if res != nil && res.Error == nil {
 			res.Data = data
