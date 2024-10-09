@@ -27,7 +27,7 @@ type Error struct {
 	Integration string `json:"-"`
 
 	// Message is the top-level message of the error.
-	Message string `json:"message"`
+	Message string `json:"message,omitempty"`
 
 	// Validations represents a list of failure validations related to the error
 	// itself. This allows to pass/retrieve additional details, such as validation
