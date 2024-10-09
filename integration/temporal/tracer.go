@@ -79,5 +79,10 @@ func (m customtracer) StartSpan(opts *interceptor.TracerStartSpanOptions) (inter
 		delete(opts.Tags, "temporalActivityID")
 	}
 
+	if v := opts.Tags["temporalUpdateID"]; v != "" {
+		opts.Tags["temporal.update.id"] = v
+		delete(opts.Tags, "temporalUpdateID")
+	}
+
 	return m.Tracer.StartSpan(opts)
 }
