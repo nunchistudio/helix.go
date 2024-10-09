@@ -5,7 +5,7 @@ if [[ -z "$GITHUB_TOKEN" ]]; then
   exit 1
 fi
 
-export GORELEASER_CURRENT_TAG=v0.17.1
+export GORELEASER_CURRENT_TAG=v0.18.0
 
 go work use -r ./
 
@@ -33,7 +33,7 @@ done
 git tag "$GORELEASER_CURRENT_TAG"
 git push --tags
 
-goreleaser release --rm-dist
+goreleaser release --clean
 
 for mod in $integrations; do
   cd ./integration/$mod

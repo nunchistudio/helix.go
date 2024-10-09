@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/stretchr/testify v1.9.0
-	go.nunchi.studio/helix v0.17.1
+	go.nunchi.studio/helix v0.18.0
 	go.opentelemetry.io/otel v1.30.0
 	go.opentelemetry.io/otel/trace v1.30.0
 	go.temporal.io/api v1.39.0
@@ -54,5 +54,3 @@ require (
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../
