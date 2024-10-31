@@ -3,7 +3,7 @@ package logger
 import (
 	"os"
 
-	"go.nunchi.studio/helix/internal/orchestrator"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 	_ "go.nunchi.studio/helix/internal/setup"
 
 	"go.uber.org/zap"
@@ -24,7 +24,7 @@ func Logger() *zap.Logger {
 
 /*
 init initializes the global logger client, with the appropriate fields given by
-the detected orchestrator. Panics if anything goes wrong (this should never
+the detected cloud provider. Panics if anything goes wrong (this should never
 happen).
 */
 func init() {
@@ -58,8 +58,8 @@ func init() {
 	cfg.EncoderConfig.TimeKey = "timestamp"
 	cfg.EncoderConfig.EncodeTime = zapcore.RFC3339NanoTimeEncoder
 
-	// Get log fields returned by the detected orchestrator.
-	fields := orchestrator.Detected.LoggerFields()
+	// Get log fields returned by the detected cloud provider.
+	fields := cloudprovider.Detected.LoggerFields()
 
 	// Finally, try to create the global logger client.
 	client, err = cfg.Build(zap.Fields(fields...))

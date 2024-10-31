@@ -6,7 +6,7 @@ import (
 
 	"go.nunchi.studio/helix/errorstack"
 	"go.nunchi.studio/helix/integration"
-	"go.nunchi.studio/helix/internal/orchestrator"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
@@ -37,7 +37,7 @@ func (r *rest) Start(ctx context.Context) error {
 
 	// Wrap the handler previously built with the one designed for OpenTelemetry
 	// traces.
-	h = otelhttp.NewHandler(h, orchestrator.Detected.Service(),
+	h = otelhttp.NewHandler(h, cloudprovider.Detected.Service(),
 		otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
 	)
 

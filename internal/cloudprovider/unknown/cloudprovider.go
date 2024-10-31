@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.nunchi.studio/helix/internal/orchestrator"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
@@ -12,33 +12,33 @@ import (
 )
 
 /*
-orch is always set since the "unknown" orchestrator is used as fallback in case
-no other orchestrator has been detected.
+cp is always set since the "unknown" cloud provider is used as fallback in case
+no other cloud provider has been detected.
 */
-var orch orchestrator.Orchestrator
+var cp cloudprovider.CloudProvider
 
 /*
 unknown holds some details about the service currently running and implements the
-Orchestrator interface.
+CloudProvider interface.
 */
 type unknown struct {
 	name string
 }
 
 /*
-init populates the orchestrator as a fallback orchestrator.
+init populates the cloud provider as a fallback cloud provider.
 */
 func init() {
-	orch = build()
+	cp = build()
 }
 
 /*
-build populates the orchestrator as a fallback orchestrator. If no orchestrator
-is returned it means an internal error occurred while finding the path to the
-Go executable currently being run, fallbacks to a static string if necessary.
-This should never happen.
+build populates the cloudprovider.Detected as a fallback cloud provider. If no
+cloud provider is returned it means an internal error occurred while finding the
+path to the Go executable currently being run, fallbacks to a static string if
+necessary. This should never happen.
 */
-func build() orchestrator.Orchestrator {
+func build() cloudprovider.CloudProvider {
 	var name string = "helix"
 
 	path, err := os.Executable()
@@ -54,21 +54,21 @@ func build() orchestrator.Orchestrator {
 }
 
 /*
-Get returns the fallback orchestrator interface.
+Get returns the fallback cloud provider interface.
 */
-func Get() orchestrator.Orchestrator {
-	return orch
+func Get() cloudprovider.CloudProvider {
+	return cp
 }
 
 /*
-String returns the string representation of the unknown orchestrator.
+String returns the string representation of the unknown cloud provider.
 */
 func (u *unknown) String() string {
 	return "unknown"
 }
 
 /*
-Service returns the service name detected by the orchestrator.
+Service returns the service name detected by the cloud provider.
 */
 func (u *unknown) Service() string {
 	return u.name

@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"os"
 
-	"go.nunchi.studio/helix/internal/orchestrator"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.uber.org/zap"
@@ -11,13 +11,13 @@ import (
 )
 
 /*
-orch is set if the service is running in Kubernetes, nil otherwise.
+cp is set if the service is running in Kubernetes, nil otherwise.
 */
-var orch orchestrator.Orchestrator
+var cp cloudprovider.CloudProvider
 
 /*
 kubernetes holds some details about the service currently running in Kubernetes
-and implements the Orchestrator interface.
+and implements the CloudProvider interface.
 */
 type kubernetes struct {
 	namespace string
@@ -25,17 +25,17 @@ type kubernetes struct {
 }
 
 /*
-init populates the orchestrator if the service is running in Kubernetes.
+init populates the cloud provider if the service is running in Kubernetes.
 */
 func init() {
-	orch = build()
+	cp = build()
 }
 
 /*
-build populates the orchestrator if the service is running in Kubernetes. Returns
-nil otherwise.
+build populates the cloud provider if the service is running in Kubernetes.
+Returns nil otherwise.
 */
-func build() orchestrator.Orchestrator {
+func build() cloudprovider.CloudProvider {
 	_, exists := os.LookupEnv("KUBERNETES_SERVICE_HOST")
 	if !exists {
 		return nil
@@ -55,22 +55,22 @@ func build() orchestrator.Orchestrator {
 }
 
 /*
-Get returns the orchestrator interface for Kubernetes. Returns nil if not running
-in Kubernetes.
+Get returns the cloud provider interface for Kubernetes. Returns nil if not
+running in Kubernetes.
 */
-func Get() orchestrator.Orchestrator {
-	return orch
+func Get() cloudprovider.CloudProvider {
+	return cp
 }
 
 /*
-String returns the string representation of the Kubernetes orchestrator.
+String returns the string representation of the Kubernetes cloud provider.
 */
 func (k *kubernetes) String() string {
 	return "kubernetes"
 }
 
 /*
-Service returns the service name detected by the orchestrator.
+Service returns the service name detected by the cloud provider.
 */
 func (k *kubernetes) Service() string {
 	return k.pod

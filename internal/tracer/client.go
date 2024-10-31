@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"go.nunchi.studio/helix/internal/orchestrator"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 	_ "go.nunchi.studio/helix/internal/setup"
 
 	"go.opentelemetry.io/otel"
@@ -43,7 +43,7 @@ func Exporter() *otlptrace.Exporter {
 
 /*
 init initializes the global tracer client, with the appropriate attributes given
-by the detected orchestrator. Panics if anything goes wrong (this should never
+by the detected cloud provider. Panics if anything goes wrong (this should never
 happen).
 */
 func init() {
@@ -72,8 +72,8 @@ func init() {
 		panic(err)
 	}
 
-	// Get trace attributes returned by the detected orchestrator.
-	resources, err := resource.New(ctx, resource.WithAttributes(orchestrator.Detected.TracerAttributes()...))
+	// Get trace attributes returned by the detected cloud provider.
+	resources, err := resource.New(ctx, resource.WithAttributes(cloudprovider.Detected.TracerAttributes()...))
 	if err != nil {
 		panic(err)
 	}

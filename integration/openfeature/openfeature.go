@@ -8,8 +8,8 @@ import (
 
 	"go.nunchi.studio/helix/errorstack"
 	"go.nunchi.studio/helix/event"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 	"go.nunchi.studio/helix/internal/logger"
-	"go.nunchi.studio/helix/internal/orchestrator"
 	"go.nunchi.studio/helix/service"
 
 	"github.com/go-logr/zapr"
@@ -106,7 +106,7 @@ func Init(cfg Config) (OpenFeature, error) {
 
 	// Finally, create the OpenFeature client with the appropriate service name
 	// and global logger.
-	conn.client = openfeature.NewClient(orchestrator.Detected.Service())
+	conn.client = openfeature.NewClient(cloudprovider.Detected.Service())
 	conn.client.WithLogger(zapr.NewLogger(logger.Logger()))
 
 	// Try to attach the integration to the service.

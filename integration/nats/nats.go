@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"go.nunchi.studio/helix/errorstack"
-	"go.nunchi.studio/helix/internal/orchestrator"
+	"go.nunchi.studio/helix/internal/cloudprovider"
 	"go.nunchi.studio/helix/service"
 
 	"github.com/nats-io/nats.go"
@@ -48,7 +48,7 @@ func Connect(cfg Config) (JetStream, error) {
 
 	// Set the default NATS options.
 	opts := []nats.Option{
-		nats.Name(orchestrator.Detected.Service()),
+		nats.Name(cloudprovider.Detected.Service()),
 		nats.ErrorHandler(asyncErrorHandler),
 	}
 

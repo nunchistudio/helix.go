@@ -13,8 +13,10 @@ types:
 scopes:
   - "bucket"
   - "clickhouse"
+  - "cloudprovider"
   - "event"
   - "errorstack"
+  - "internal"
   - "logger"
   - "nats"
   - "openfeature"
