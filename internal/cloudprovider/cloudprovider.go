@@ -23,6 +23,7 @@ type CloudProvider interface {
 	//
 	//   "kubernetes"
 	//   "nomad"
+	//   "render"
 	//   "unknown"
 	String() string
 
