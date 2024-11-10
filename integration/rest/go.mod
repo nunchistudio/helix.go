@@ -8,7 +8,7 @@ require (
 	github.com/uptrace/bunrouter v1.0.22
 	github.com/uptrace/bunrouter/extra/bunrouterotel v1.0.22
 	github.com/uptrace/bunrouter/extra/reqlog v1.0.22
-	go.nunchi.studio/helix v0.18.1
+	go.nunchi.studio/helix v0.19.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.57.0
 	golang.org/x/text v0.20.0
 )
@@ -55,5 +55,3 @@ require (
 	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../
