@@ -6,42 +6,66 @@ import (
 
 /*
 WriteOK writes a 200 status code and body to the HTTP response writer.
-
-WithErrorMessage and WithValidations have no effect here since no error is
-returned in 2xx responses.
 */
-func WriteOK(rw http.ResponseWriter, req *http.Request, opts ...With) {
+func WriteOK[T any](rw http.ResponseWriter, req *http.Request, opts ...WithOnSuccess) {
 	res := &Response{
 		Status: http.StatusText(http.StatusOK),
 	}
 
-	writeResponse(http.StatusOK, rw, res, opts...)
+	for _, opt := range opts {
+		opt(res)
+	}
+
+	writeResponseOnSuccess[T](http.StatusOK, rw, res, req, opts...)
+}
+
+/*
+WriteEmptyOK returns WriteOK with no "metadata" and no "data".
+*/
+func WriteEmptyOK(rw http.ResponseWriter, req *http.Request) {
+	WriteOK[struct{}](rw, req)
 }
 
 /*
 WriteCreated writes a 201 status code and body to the HTTP response writer.
-
-WithErrorMessage and WithValidations have no effect here since no error is
-returned in 2xx responses.
 */
-func WriteCreated(rw http.ResponseWriter, req *http.Request, opts ...With) {
+func WriteCreated[T any](rw http.ResponseWriter, req *http.Request, opts ...WithOnSuccess) {
 	res := &Response{
 		Status: http.StatusText(http.StatusCreated),
 	}
 
-	writeResponse(http.StatusCreated, rw, res, opts...)
+	for _, opt := range opts {
+		opt(res)
+	}
+
+	writeResponseOnSuccess[T](http.StatusCreated, rw, res, req, opts...)
+}
+
+/*
+WriteEmptyCreated returns WriteCreated with no "metadata" and no "data".
+*/
+func WriteEmptyCreated(rw http.ResponseWriter, req *http.Request) {
+	WriteCreated[struct{}](rw, req)
 }
 
 /*
 WriteAccepted writes a 202 status code and body to the HTTP response writer.
-
-WithErrorMessage and WithValidations have no effect here since no error is
-returned in 2xx responses.
 */
-func WriteAccepted(rw http.ResponseWriter, req *http.Request, opts ...With) {
+func WriteAccepted[T any](rw http.ResponseWriter, req *http.Request, opts ...WithOnSuccess) {
 	res := &Response{
 		Status: http.StatusText(http.StatusAccepted),
 	}
 
-	writeResponse(http.StatusAccepted, rw, res, opts...)
+	for _, opt := range opts {
+		opt(res)
+	}
+
+	writeResponseOnSuccess[T](http.StatusAccepted, rw, res, req, opts...)
+}
+
+/*
+WriteEmptyAccepted returns WriteAccepted with no "metadata" and no "data".
+*/
+func WriteEmptyAccepted(rw http.ResponseWriter, req *http.Request) {
+	WriteAccepted[struct{}](rw, req)
 }

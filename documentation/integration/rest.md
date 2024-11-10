@@ -29,7 +29,7 @@ func main() {
   router.POST("/users/:id", func(rw http.ResponseWriter, req *http.Request) {
     params, ok := rest.ParamsFromContext(req.Context())
     if !ok {
-      rest.WriteNotFound(rw, req)
+      rest.WriteEmptyNotFound(rw, req)
       return
     }
 
@@ -37,7 +37,7 @@ func main() {
     
     // ...
     
-    rest.WriteAccepted(rw, req)
+    rest.WriteEmptyAccepted(rw, req)
   })
 
   if err := service.Start(); err != nil {

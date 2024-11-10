@@ -19,7 +19,7 @@ func TestWriteInternalServerError(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
@@ -35,7 +35,7 @@ func TestWriteInternalServerError(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusInternalServerError),
 				Error: &errorstack.Error{
@@ -46,12 +46,9 @@ func TestWriteInternalServerError(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -67,7 +64,7 @@ func TestWriteInternalServerError(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteInternalServerError(tc.rw, tc.req, tc.attachments...)
+		WriteInternalServerError[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusInternalServerError, tc.rw.Code)
 
@@ -85,7 +82,7 @@ func TestWriteServiceUnavailable(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
@@ -101,7 +98,7 @@ func TestWriteServiceUnavailable(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusServiceUnavailable),
 				Error: &errorstack.Error{
@@ -112,12 +109,9 @@ func TestWriteServiceUnavailable(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -133,7 +127,7 @@ func TestWriteServiceUnavailable(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteServiceUnavailable(tc.rw, tc.req, tc.attachments...)
+		WriteServiceUnavailable[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusServiceUnavailable, tc.rw.Code)
 

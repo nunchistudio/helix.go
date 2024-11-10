@@ -19,13 +19,13 @@ func TestWriteBadRequest(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
 			rw:          httptest.NewRecorder(),
 			req:         nil,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusBadRequest),
 				Error: &errorstack.Error{
@@ -36,7 +36,7 @@ func TestWriteBadRequest(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusBadRequest),
 				Error: &errorstack.Error{
@@ -47,12 +47,9 @@ func TestWriteBadRequest(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -68,8 +65,8 @@ func TestWriteBadRequest(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithValidations([]errorstack.Validation{
+			withOnError: []WithOnError{
+				WithValidationsOnError([]errorstack.Validation{
 					{
 						Message: "Property \"name\" is missing",
 						Path:    []string{"request", "body", "event", "name"},
@@ -92,7 +89,7 @@ func TestWriteBadRequest(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteBadRequest(tc.rw, tc.req, tc.attachments...)
+		WriteBadRequest[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusBadRequest, tc.rw.Code)
 
@@ -110,13 +107,13 @@ func TestWriteUnauthorized(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
 			rw:          httptest.NewRecorder(),
 			req:         nil,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusUnauthorized),
 				Error: &errorstack.Error{
@@ -127,7 +124,7 @@ func TestWriteUnauthorized(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusUnauthorized),
 				Error: &errorstack.Error{
@@ -138,12 +135,9 @@ func TestWriteUnauthorized(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -159,8 +153,8 @@ func TestWriteUnauthorized(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithValidations([]errorstack.Validation{
+			withOnError: []WithOnError{
+				WithValidationsOnError([]errorstack.Validation{
 					{
 						Message: "Please contact the account owner",
 					},
@@ -181,7 +175,7 @@ func TestWriteUnauthorized(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteUnauthorized(tc.rw, tc.req, tc.attachments...)
+		WriteUnauthorized[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusUnauthorized, tc.rw.Code)
 
@@ -199,13 +193,13 @@ func TestWritePaymentRequired(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
 			rw:          httptest.NewRecorder(),
 			req:         nil,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusPaymentRequired),
 				Error: &errorstack.Error{
@@ -216,7 +210,7 @@ func TestWritePaymentRequired(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusPaymentRequired),
 				Error: &errorstack.Error{
@@ -227,12 +221,9 @@ func TestWritePaymentRequired(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -248,8 +239,8 @@ func TestWritePaymentRequired(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithValidations([]errorstack.Validation{
+			withOnError: []WithOnError{
+				WithValidationsOnError([]errorstack.Validation{
 					{
 						Message: "Please contact the account owner",
 					},
@@ -270,7 +261,7 @@ func TestWritePaymentRequired(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WritePaymentRequired(tc.rw, tc.req, tc.attachments...)
+		WritePaymentRequired[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusPaymentRequired, tc.rw.Code)
 
@@ -288,13 +279,13 @@ func TestWriteForbidden(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
 			rw:          httptest.NewRecorder(),
 			req:         nil,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusForbidden),
 				Error: &errorstack.Error{
@@ -305,7 +296,7 @@ func TestWriteForbidden(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusForbidden),
 				Error: &errorstack.Error{
@@ -316,12 +307,9 @@ func TestWriteForbidden(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -337,8 +325,8 @@ func TestWriteForbidden(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithValidations([]errorstack.Validation{
+			withOnError: []WithOnError{
+				WithValidationsOnError([]errorstack.Validation{
 					{
 						Message: "Please contact the account owner",
 					},
@@ -359,7 +347,7 @@ func TestWriteForbidden(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteForbidden(tc.rw, tc.req, tc.attachments...)
+		WriteForbidden[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusForbidden, tc.rw.Code)
 
@@ -377,7 +365,7 @@ func TestWriteNotFound(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
@@ -393,7 +381,7 @@ func TestWriteNotFound(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusNotFound),
 				Error: &errorstack.Error{
@@ -404,12 +392,9 @@ func TestWriteNotFound(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -425,7 +410,7 @@ func TestWriteNotFound(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteNotFound(tc.rw, tc.req, tc.attachments...)
+		WriteNotFound[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusNotFound, tc.rw.Code)
 
@@ -443,7 +428,7 @@ func TestWriteMethodNotAllowed(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
@@ -459,7 +444,7 @@ func TestWriteMethodNotAllowed(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusMethodNotAllowed),
 				Error: &errorstack.Error{
@@ -470,12 +455,9 @@ func TestWriteMethodNotAllowed(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -491,7 +473,7 @@ func TestWriteMethodNotAllowed(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteMethodNotAllowed(tc.rw, tc.req, tc.attachments...)
+		WriteMethodNotAllowed[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusMethodNotAllowed, tc.rw.Code)
 
@@ -509,7 +491,7 @@ func TestWriteConflict(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
@@ -525,7 +507,7 @@ func TestWriteConflict(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusConflict),
 				Error: &errorstack.Error{
@@ -536,12 +518,9 @@ func TestWriteConflict(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -557,7 +536,7 @@ func TestWriteConflict(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteConflict(tc.rw, tc.req, tc.attachments...)
+		WriteConflict[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusConflict, tc.rw.Code)
 
@@ -575,13 +554,13 @@ func TestWriteRequestEntityTooLarge(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
 			rw:          httptest.NewRecorder(),
 			req:         nil,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusRequestEntityTooLarge),
 				Error: &errorstack.Error{
@@ -592,7 +571,7 @@ func TestWriteRequestEntityTooLarge(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusRequestEntityTooLarge),
 				Error: &errorstack.Error{
@@ -603,12 +582,9 @@ func TestWriteRequestEntityTooLarge(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -624,8 +600,8 @@ func TestWriteRequestEntityTooLarge(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithValidations([]errorstack.Validation{
+			withOnError: []WithOnError{
+				WithValidationsOnError([]errorstack.Validation{
 					{
 						Message: "Payload must not be larger than 400kb",
 					},
@@ -646,7 +622,7 @@ func TestWriteRequestEntityTooLarge(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteRequestEntityTooLarge(tc.rw, tc.req, tc.attachments...)
+		WriteRequestEntityTooLarge[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusRequestEntityTooLarge, tc.rw.Code)
 
@@ -664,13 +640,13 @@ func TestWriteTooManyRequests(t *testing.T) {
 	testcases := []struct {
 		rw          *httptest.ResponseRecorder
 		req         *http.Request
-		attachments []With
+		withOnError []WithOnError
 		expected    Response
 	}{
 		{
 			rw:          httptest.NewRecorder(),
 			req:         nil,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusTooManyRequests),
 				Error: &errorstack.Error{
@@ -681,7 +657,7 @@ func TestWriteTooManyRequests(t *testing.T) {
 		{
 			rw:          httptest.NewRecorder(),
 			req:         reqWithLang,
-			attachments: nil,
+			withOnError: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusTooManyRequests),
 				Error: &errorstack.Error{
@@ -692,12 +668,9 @@ func TestWriteTooManyRequests(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]string{
+			withOnError: []WithOnError{
+				WithMetadataOnError(map[string]string{
 					"anything": "value",
-				}),
-				WithData(map[string]string{
-					"id": "Data object should be ignored",
 				}),
 			},
 			expected: Response{
@@ -713,8 +686,8 @@ func TestWriteTooManyRequests(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithValidations([]errorstack.Validation{
+			withOnError: []WithOnError{
+				WithValidationsOnError([]errorstack.Validation{
 					{
 						Message: "Subscription is limited to 100 requests per minute",
 					},
@@ -735,7 +708,7 @@ func TestWriteTooManyRequests(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		WriteTooManyRequests(tc.rw, tc.req, tc.attachments...)
+		WriteTooManyRequests[Response](tc.rw, tc.req, tc.withOnError...)
 
 		assert.Equal(t, http.StatusTooManyRequests, tc.rw.Code)
 

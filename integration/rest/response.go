@@ -97,7 +97,7 @@ handlerNotFound is the default handler function if the path is not found (error
 404).
 */
 func (r *rest) handlerNotFound(rw http.ResponseWriter, req bunrouter.Request) error {
-	WriteNotFound(rw, req.Request)
+	WriteEmptyNotFound(rw, req.Request)
 	return nil
 }
 
@@ -106,6 +106,6 @@ handlerMethodNotAllowed is the default handler function if the method is not
 allowed (error 405).
 */
 func (r *rest) handlerMethodNotAllowed(rw http.ResponseWriter, req bunrouter.Request) error {
-	WriteMethodNotAllowed(rw, req.Request)
+	WriteEmptyMethodNotAllowed(rw, req.Request)
 	return nil
 }

@@ -11,17 +11,41 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type responseWithUser struct {
+	Status string            `json:"status"`
+	Error  *errorstack.Error `json:"error,omitempty"`
+	Data   struct {
+		User struct {
+			ID string `json:"id"`
+		} `json:"user"`
+	} `json:"data,omitempty"`
+}
+
+type responseWithTemporalMetadata struct {
+	Status       string            `json:"status"`
+	Error        *errorstack.Error `json:"error,omitempty"`
+	Metadatadata struct {
+		Temporal struct {
+			Workflow struct {
+				ID  string `json:"id"`
+				Run struct {
+					ID string `json:"id"`
+				} `json:"run"`
+			} `json:"workflow"`
+		} `json:"temporal"`
+	} `json:"metadata,omitempty"`
+}
+
 func TestWriteOK(t *testing.T) {
 	testcases := []struct {
-		rw          *httptest.ResponseRecorder
-		req         *http.Request
-		attachments []With
-		expected    Response
+		rw            *httptest.ResponseRecorder
+		req           *http.Request
+		withOnSuccess []WithOnSuccess
+		expected      Response
 	}{
 		{
-			rw:          httptest.NewRecorder(),
-			req:         nil,
-			attachments: nil,
+			rw:  httptest.NewRecorder(),
+			req: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusOK),
 			},
@@ -29,8 +53,8 @@ func TestWriteOK(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithData(map[string]map[string]string{
+			withOnSuccess: []WithOnSuccess{
+				WithDataOnSuccess(map[string]map[string]string{
 					"user": {
 						"id": "fd97b96a-c399-4a2b-9c07-ff2f93ab97e0",
 					},
@@ -45,25 +69,10 @@ func TestWriteOK(t *testing.T) {
 				},
 			},
 		},
-		{
-			rw:  httptest.NewRecorder(),
-			req: nil,
-			attachments: []With{
-				WithErrorMessage("This error message should be ignored"),
-				WithValidations([]errorstack.Validation{
-					{
-						Message: "This validation should be ignored",
-					},
-				}),
-			},
-			expected: Response{
-				Status: http.StatusText(http.StatusOK),
-			},
-		},
 	}
 
 	for _, tc := range testcases {
-		WriteOK(tc.rw, tc.req, tc.attachments...)
+		WriteOK[responseWithUser](tc.rw, tc.req, tc.withOnSuccess...)
 
 		assert.Equal(t, http.StatusOK, tc.rw.Code)
 
@@ -75,15 +84,15 @@ func TestWriteOK(t *testing.T) {
 
 func TestWriteCreated(t *testing.T) {
 	testcases := []struct {
-		rw          *httptest.ResponseRecorder
-		req         *http.Request
-		attachments []With
-		expected    Response
+		rw            *httptest.ResponseRecorder
+		req           *http.Request
+		withOnSuccess []WithOnSuccess
+		expected      Response
 	}{
 		{
-			rw:          httptest.NewRecorder(),
-			req:         nil,
-			attachments: nil,
+			rw:            httptest.NewRecorder(),
+			req:           nil,
+			withOnSuccess: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusCreated),
 			},
@@ -91,8 +100,8 @@ func TestWriteCreated(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithData(map[string]map[string]string{
+			withOnSuccess: []WithOnSuccess{
+				WithDataOnSuccess(map[string]map[string]string{
 					"user": {
 						"id": "fd97b96a-c399-4a2b-9c07-ff2f93ab97e0",
 					},
@@ -107,25 +116,10 @@ func TestWriteCreated(t *testing.T) {
 				},
 			},
 		},
-		{
-			rw:  httptest.NewRecorder(),
-			req: nil,
-			attachments: []With{
-				WithErrorMessage("This error message should be ignored"),
-				WithValidations([]errorstack.Validation{
-					{
-						Message: "This validation should be ignored",
-					},
-				}),
-			},
-			expected: Response{
-				Status: http.StatusText(http.StatusCreated),
-			},
-		},
 	}
 
 	for _, tc := range testcases {
-		WriteCreated(tc.rw, tc.req, tc.attachments...)
+		WriteCreated[responseWithUser](tc.rw, tc.req, tc.withOnSuccess...)
 
 		assert.Equal(t, http.StatusCreated, tc.rw.Code)
 
@@ -137,15 +131,15 @@ func TestWriteCreated(t *testing.T) {
 
 func TestWriteAccepted(t *testing.T) {
 	testcases := []struct {
-		rw          *httptest.ResponseRecorder
-		req         *http.Request
-		attachments []With
-		expected    Response
+		rw            *httptest.ResponseRecorder
+		req           *http.Request
+		withOnSuccess []WithOnSuccess
+		expected      Response
 	}{
 		{
-			rw:          httptest.NewRecorder(),
-			req:         nil,
-			attachments: nil,
+			rw:            httptest.NewRecorder(),
+			req:           nil,
+			withOnSuccess: nil,
 			expected: Response{
 				Status: http.StatusText(http.StatusAccepted),
 			},
@@ -153,43 +147,36 @@ func TestWriteAccepted(t *testing.T) {
 		{
 			rw:  httptest.NewRecorder(),
 			req: nil,
-			attachments: []With{
-				WithMetadata(map[string]map[string]string{
+			withOnSuccess: []WithOnSuccess{
+				WithMetadataOnSuccess(map[string]map[string]any{
 					"temporal": {
-						"workflow_id": "fd54bb5b-5153-437e-ba8e-df1c4ad77706",
-						"run_id":      "40d0fe4b-cab2-4b6f-a497-891545f241ae",
+						"workflow": map[string]any{
+							"id": "fd54bb5b-5153-437e-ba8e-df1c4ad77706",
+							"run": map[string]string{
+								"id": "40d0fe4b-cab2-4b6f-a497-891545f241ae",
+							},
+						},
 					},
 				}),
 			},
 			expected: Response{
 				Status: http.StatusText(http.StatusAccepted),
-				Metadata: map[string]map[string]string{
+				Metadata: map[string]map[string]any{
 					"temporal": {
-						"workflow_id": "fd54bb5b-5153-437e-ba8e-df1c4ad77706",
-						"run_id":      "40d0fe4b-cab2-4b6f-a497-891545f241ae",
+						"workflow": map[string]any{
+							"id": "fd54bb5b-5153-437e-ba8e-df1c4ad77706",
+							"run": map[string]string{
+								"id": "40d0fe4b-cab2-4b6f-a497-891545f241ae",
+							},
+						},
 					},
 				},
-			},
-		},
-		{
-			rw:  httptest.NewRecorder(),
-			req: nil,
-			attachments: []With{
-				WithErrorMessage("This error message should be ignored"),
-				WithValidations([]errorstack.Validation{
-					{
-						Message: "This validation should be ignored",
-					},
-				}),
-			},
-			expected: Response{
-				Status: http.StatusText(http.StatusAccepted),
 			},
 		},
 	}
 
 	for _, tc := range testcases {
-		WriteAccepted(tc.rw, tc.req, tc.attachments...)
+		WriteAccepted[responseWithTemporalMetadata](tc.rw, tc.req, tc.withOnSuccess...)
 
 		assert.Equal(t, http.StatusAccepted, tc.rw.Code)
 

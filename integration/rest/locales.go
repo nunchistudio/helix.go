@@ -37,25 +37,6 @@ var supportedLocales = map[language.Tag]map[int]string{
 }
 
 /*
-addFrenchLocalesForTest adds locales in French. Used for testing only.
-*/
-func addFrenchLocalesForTest() {
-	AddOrEditLanguage(language.French, map[int]string{
-		http.StatusBadRequest:            "Échec de la validation de la requête",
-		http.StatusUnauthorized:          "Vous n'êtes pas autorisé à effectuer cette action",
-		http.StatusPaymentRequired:       "La requête a échoué car un paiement est requis",
-		http.StatusForbidden:             "Vous n'avez pas les permissions requises pour effectuer cette action",
-		http.StatusNotFound:              "La ressource n'existe pas",
-		http.StatusMethodNotAllowed:      "La ressource ne supporte pas cette méthode",
-		http.StatusConflict:              "Échec du traitement de la requête en raison d'un conflit",
-		http.StatusRequestEntityTooLarge: "Impossible de traiter une requête avec un payload trop large",
-		http.StatusTooManyRequests:       "La limite du taux de requêtes a été atteinte",
-		http.StatusInternalServerError:   "Nous avons été informés de cette erreur interne inattendue",
-		http.StatusServiceUnavailable:    "Veuillez réessayer dans quelques instants",
-	})
-}
-
-/*
 AddOrEditLanguage allows a service to add or edit a language support for error
 messages in the HTTP REST API, based on the status code returned.
 

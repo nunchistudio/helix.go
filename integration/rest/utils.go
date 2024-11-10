@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"go.nunchi.studio/helix/errorstack"
+	"go.nunchi.studio/helix/telemetry/log"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
@@ -19,15 +20,44 @@ import (
 )
 
 /*
-writeResponse is a small utility used by all HTTP response writer functions of
-this package to easily write response's status code and body.
+writeResponseOnError is a small utility used by 4xx and 5xx HTTP response writer
+functions of this package to easily write response's status code and body.
 */
-func writeResponse(status int, rw http.ResponseWriter, res *Response, opts ...With) {
+func writeResponseOnError[T any](status int, rw http.ResponseWriter, res *Response, req *http.Request, opts ...WithOnError) {
 	for _, opt := range opts {
 		opt(res)
 	}
 
-	b, _ := json.Marshal(res)
+	writeResponse[T](status, rw, res, req)
+}
+
+/*
+writeResponseOnSuccess is a small utility used by 2xx HTTP response writer
+functions of this package to easily write response's status code and body.
+*/
+func writeResponseOnSuccess[T any](status int, rw http.ResponseWriter, res *Response, req *http.Request, opts ...WithOnSuccess) {
+	for _, opt := range opts {
+		opt(res)
+	}
+
+	writeResponse[T](status, rw, res, req)
+}
+
+/*
+writeResponse is a small utility to easily write response's status code and body.
+*/
+func writeResponse[T any](status int, rw http.ResponseWriter, res *Response, req *http.Request) {
+	b, err := json.Marshal(res)
+	if err != nil {
+		WriteEmptyInternalServerError(rw, req)
+		return
+	}
+
+	var typed T
+	if err := json.Unmarshal(b, &typed); err != nil {
+		log.Error(req.Context(), "http response does not comply to struct `rest.Response`")
+	}
+
 	rw.WriteHeader(status)
 	rw.Write(b)
 }
