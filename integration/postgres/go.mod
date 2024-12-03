@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/stretchr/testify v1.9.0
-	go.nunchi.studio/helix v0.19.0
+	go.nunchi.studio/helix v0.19.1
 )
 
 retract (
@@ -44,5 +44,3 @@ require (
 	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../
