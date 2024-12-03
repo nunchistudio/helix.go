@@ -98,6 +98,16 @@ func (cfg *ConfigTLS) ToStandardTLS() (*tls.Config, []errorstack.Validation) {
 		})
 	}
 
+	tlsConfig := &tls.Config{
+		ServerName:         cfg.ServerName,
+		InsecureSkipVerify: cfg.InsecureSkipVerify,
+		Certificates:       []tls.Certificate{cert},
+	}
+
+	if len(cfg.RootCAFiles) == 0 {
+		return tlsConfig, nil
+	}
+
 	caCertPool := x509.NewCertPool()
 	for _, ca := range cfg.RootCAFiles {
 		caCert, err := os.ReadFile(ca)
@@ -112,7 +122,7 @@ func (cfg *ConfigTLS) ToStandardTLS() (*tls.Config, []errorstack.Validation) {
 		ok := caCertPool.AppendCertsFromPEM(caCert)
 		if !ok {
 			validations = append(validations, errorstack.Validation{
-				Message: err.Error(),
+				Message: "failed to append root certificate from pem",
 			})
 		}
 	}
@@ -121,12 +131,6 @@ func (cfg *ConfigTLS) ToStandardTLS() (*tls.Config, []errorstack.Validation) {
 		return nil, validations
 	}
 
-	tlsConfig := &tls.Config{
-		ServerName:         cfg.ServerName,
-		InsecureSkipVerify: cfg.InsecureSkipVerify,
-		Certificates:       []tls.Certificate{cert},
-		RootCAs:            caCertPool,
-	}
-
+	tlsConfig.RootCAs = caCertPool
 	return tlsConfig, nil
 }
