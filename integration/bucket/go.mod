@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/stretchr/testify v1.10.0
-	go.nunchi.studio/helix v0.19.1
+	go.nunchi.studio/helix v0.19.2
 	gocloud.dev v0.40.0
 )
 
@@ -109,5 +109,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../

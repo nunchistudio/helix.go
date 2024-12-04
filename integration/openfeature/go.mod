@@ -8,7 +8,7 @@ require (
 	github.com/open-feature/go-sdk-contrib/providers/go-feature-flag-in-process v0.1.0
 	github.com/stretchr/testify v1.10.0
 	github.com/thomaspoignant/go-feature-flag v1.39.1
-	go.nunchi.studio/helix v0.19.1
+	go.nunchi.studio/helix v0.19.2
 	go.opentelemetry.io/otel v1.32.0
 	go.opentelemetry.io/otel/trace v1.32.0
 )
@@ -51,5 +51,3 @@ require (
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace go.nunchi.studio/helix => ../../

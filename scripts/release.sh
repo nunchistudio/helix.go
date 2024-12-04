@@ -5,7 +5,7 @@ if [[ -z "$GITHUB_TOKEN" ]]; then
   exit 1
 fi
 
-export GORELEASER_CURRENT_TAG=v0.19.1
+export GORELEASER_CURRENT_TAG=v0.19.2
 
 go work use -r ./
 
