@@ -96,6 +96,8 @@ func (cfg *ConfigTLS) ToStandardTLS() (*tls.Config, []errorstack.Validation) {
 		validations = append(validations, errorstack.Validation{
 			Message: err.Error(),
 		})
+
+		return nil, validations
 	}
 
 	tlsConfig := &tls.Config{
@@ -122,7 +124,7 @@ func (cfg *ConfigTLS) ToStandardTLS() (*tls.Config, []errorstack.Validation) {
 		ok := caCertPool.AppendCertsFromPEM(caCert)
 		if !ok {
 			validations = append(validations, errorstack.Validation{
-				Message: "failed to append root certificate from pem",
+				Message: "Failed to append root certificate from pem",
 			})
 		}
 	}
