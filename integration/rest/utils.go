@@ -69,8 +69,6 @@ for 404 and 405 HTTP errors, as well as for the health endpoint.
 func (r *rest) buildRouter() (*bunrouter.CompatRouter, []errorstack.Validation) {
 	opts := []bunrouter.Option{
 		bunrouter.Use(reqlog.NewMiddleware(reqlog.WithEnabled(false))),
-		bunrouter.WithNotFoundHandler(r.handlerNotFound),
-		bunrouter.WithMethodNotAllowedHandler(r.handlerMethodNotAllowed),
 		bunrouter.Use(bunrouterotel.NewMiddleware(bunrouterotel.WithClientIP())),
 		bunrouter.WithMiddleware(func(next bunrouter.HandlerFunc) bunrouter.HandlerFunc {
 			return func(rw http.ResponseWriter, req bunrouter.Request) error {
@@ -78,6 +76,8 @@ func (r *rest) buildRouter() (*bunrouter.CompatRouter, []errorstack.Validation) 
 				return next(rw, req)
 			}
 		}),
+		bunrouter.WithNotFoundHandler(r.handlerNotFound),
+		bunrouter.WithMethodNotAllowedHandler(r.handlerMethodNotAllowed),
 	}
 
 	if r.config.OpenAPI.Enabled {
